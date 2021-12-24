@@ -42,7 +42,15 @@
           <?php if(in_array('createAttribute', $user_permission) || in_array('updateAttribute', $user_permission) || in_array('viewAttribute', $user_permission) || in_array('deleteAttribute', $user_permission)): ?>
           <li id="attributeNav">
             <a href="<?php echo base_url('Controller_Element/') ?>">
-              <i class="fa fa-files-o"></i> <span>Elements</span>
+              <i class="far fa-copy"></i> <span>Elements</span>
+            </a>
+          </li>
+          <?php endif; ?>
+
+          <?php if(in_array('createAttribute', $user_permission) || in_array('updateAttribute', $user_permission) || in_array('viewAttribute', $user_permission) || in_array('deleteAttribute', $user_permission)): ?>
+          <li id="vaccineNav">
+            <a href="<?php echo base_url('Controller_Vaccine/') ?>">
+              <i class="fas fa-syringe"></i> <span>Vaccines</span>
             </a>
           </li>
           <?php endif; ?>
