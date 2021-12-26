@@ -27,13 +27,22 @@ class Controller_Vaccine extends Admin_Controller
 		$this->render_template('vaccines/index', $this->data);	
 	}
 
+	public function vaccines_per_location($vaccine_id){
+		if(!in_array('viewAttribute', $this->permission)) {
+			redirect('dashboard', 'refresh');
+		}
+		$this->data['vaccine'] =  $this->vaccines->getVaccinesData($vaccine_id);
+		//print_r($this->data['vaccine'] );
+		$this->render_template('vaccines/vaccines_per_location', $this->data);	
+	}
+
 	/* 
 	* fetch the attribute data through attribute id 
 	*/
-	public function fetchAttributeDataById($id) 
+	public function fetchVaccineDataById($id) 
 	{
 		if($id) {
-			$data = $this->model_attributes->getAttributeData($id);
+			$data = $this->vaccines->getVaccinesData($id);
 			echo json_encode($data);
 		}
 	}
@@ -50,7 +59,7 @@ class Controller_Vaccine extends Admin_Controller
 		foreach ($data as $key => $value) {
 
 		//	$count_attribute_value = $this->model_attributes->countAttributeValue($value['id']);
-
+			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccines_per_location/'.$value['id'].'').'">View Data</a>';
 			// button
 			$buttons = '
 			<button type="button" class="btn btn-warning btn-sm" onclick="editFunc('.$value['id'].')" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button>
@@ -62,14 +71,43 @@ class Controller_Vaccine extends Admin_Controller
 			$result['data'][$key] = array(
 				$value['description'],
 				$value['qty_onhand'],
-                $value['qty_requested'],
-                $value['qty_issued'],
+				$quantity_issued,
                 $value['remarks'],
 				$buttons
 			);
 		} // /foreach
 
 		echo json_encode($result);
+	}
+
+	public function fetchVaccinesDataPerLocation($vaccine_id){
+
+		$result = array('data' => array());
+
+		$data = $this->vaccines->getVaccinesDataPerLocation($vaccine_id);
+		//print_r($data);
+		foreach ($data as $key => $value) {
+			
+		//	$count_attribute_value = $this->model_attributes->countAttributeValue($value['id']);
+			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccines_per_location').'">1</a>';
+			// button
+			$buttons = '<button type="button" class="btn btn-warning btn-sm" onclick="editFunc('.$value['id'].')" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button>
+			<button type="button" class="btn btn-danger btn-sm" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal"><i class="fa fa-trash"></i></button>
+			
+			';
+
+			//$status = ($value['active'] == 1) ? '<span class="label label-success">Active</span>' : '<span class="label label-warning">Inactive</span>';
+			
+			$result['data'][$key] = array(
+				$value['location'],
+				$value['quantity'],
+                $value['address'],
+				$buttons
+			);
+		} // /foreach
+
+		echo json_encode($result);
+
 	}
 
 	/* 
@@ -83,18 +121,20 @@ class Controller_Vaccine extends Admin_Controller
 
 		$response = array();
 
-		$this->form_validation->set_rules('attribute_name', 'Vaccine name', 'trim|required');
-		$this->form_validation->set_rules('active', 'Active', 'trim|required');
+		$this->form_validation->set_rules('vaccine_name', 'Vaccine name', 'trim|required');
 
 		$this->form_validation->set_error_delimiters('<p class="text-danger">','</p>');
 
         if ($this->form_validation->run() == TRUE) {
         	$data = array(
-        		'name' => $this->input->post('attribute_name'),
-        		'active' => $this->input->post('active'),	
+        		'description' => $this->input->post('vaccine_name'),
+        		'qty_onhand' => $this->input->post('vaccine_onhand'),	
+				'qty_requested' => $this->input->post('vaccine_requested'),	
+				'qty_issued' => $this->input->post('vaccine_issued'),	
+				'remarks' => $this->input->post('vaccine_remarks'),	
         	);
 
-        	$create = $this->model_attributes->create($data);
+        	$create = $this->vaccines->create($data);
         	if($create == true) {
         		$response['success'] = true;
         		$response['messages'] = 'Succesfully created';
@@ -126,18 +166,20 @@ class Controller_Vaccine extends Admin_Controller
 		$response = array();
 
 		if($id) {
-			$this->form_validation->set_rules('edit_attribute_name', 'Vaccine name', 'trim|required');
-			$this->form_validation->set_rules('edit_active', 'Active', 'trim|required');
+			$this->form_validation->set_rules('edit_vaccine_name', 'Vaccine name', 'trim|required');
 
 			$this->form_validation->set_error_delimiters('<p class="text-danger">','</p>');
 
 	        if ($this->form_validation->run() == TRUE) {
 	        	$data = array(
-	        		'name' => $this->input->post('edit_attribute_name'),
-	        		'active' => $this->input->post('edit_active'),	
-	        	);
+					'description' => $this->input->post('edit_vaccine_name'),
+					'qty_onhand' => $this->input->post('edit_vaccine_onhand'),	
+					'qty_requested' => $this->input->post('edit_vaccine_requested'),	
+					'qty_issued' => $this->input->post('edit_vaccine_issued'),	
+					'remarks' => $this->input->post('edit_vaccine_remarks'),	
+				);
 
-	        	$update = $this->model_attributes->update($data, $id);
+	        	$update = $this->vaccines->update($data, $id);
 	        	if($update == true) {
 	        		$response['success'] = true;
 	        		$response['messages'] = 'Succesfully updated';

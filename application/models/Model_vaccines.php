@@ -29,6 +29,20 @@ class Model_vaccines extends CI_Model
 		return $query->result_array();
 	}
 
+	/*get vaccine data per location */
+	public function getVaccinesDataPerLocation($id = null)
+	{
+		/*if($id) {
+			$sql = "SELECT * FROM vaccines_per_location where vaccine_id = ?";
+			$query = $this->db->query($sql, array($id));
+			return $query->row_array();
+		}*/
+
+		$sql = "SELECT * FROM vaccines_per_location where vaccine_id = '$id'";
+		$query = $this->db->query($sql);
+		return $query->result_array();
+	}
+
 	public function countAttributeValue($id = null)
 	{
 		if($id) {
@@ -57,7 +71,7 @@ class Model_vaccines extends CI_Model
 	public function create($data)
 	{
 		if($data) {
-			$insert = $this->db->insert('attributes', $data);
+			$insert = $this->db->insert('vaccines', $data);
 			return ($insert == true) ? true : false;
 		}
 	}
@@ -66,7 +80,7 @@ class Model_vaccines extends CI_Model
 	{
 		if($data && $id) {
 			$this->db->where('id', $id);
-			$update = $this->db->update('attributes', $data);
+			$update = $this->db->update('vaccines', $data);
 			return ($update == true) ? true : false;
 		}
 	}

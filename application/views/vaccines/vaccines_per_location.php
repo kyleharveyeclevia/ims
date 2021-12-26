@@ -7,8 +7,7 @@
   <!-- Content Header (Page header) -->
   <section class="content-header">
     <h1>
-      Manage Vaccines
-     
+      <?= $vaccine['description'] ?>
     </h1>
     <ol class="breadcrumb">
       <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -45,13 +44,12 @@
          
           <!-- /.box-header -->
           <div class="box-body">
-            <table id="vaccineTable" class="table table-bordered table-striped">
+            <table id="vaccineTablePerLocation" class="table table-bordered table-striped">
               <thead>
               <tr>
-                <th>Vaccine Description</th>
+                <th>Clinic</th>
                 <th>Quantity</th>
-                <th>Quantity Issued</th>
-                <th>Remarks</th>
+                <th>Clinic Location</th>
                 <?php //if(in_array('updateGroup', $user_permission) || in_array('deleteGroup', $user_permission)): ?>
                   <th>Action</th>
                 <?php //endif; ?>
@@ -208,15 +206,15 @@
 <script type="text/javascript">
 var manageTable;
 var base_url = "<?php echo base_url(); ?>";
-
+var vaccine_id = "<?= $vaccine['id'] ?>";
 $(document).ready(function() {
-  
+  console.log('vaccine id:'+vaccine_id);
   
 
   $("#vaccineNav").addClass('active');
 
   // initialize the datatable 
-  manageTable = $('#vaccineTable').DataTable({
+  manageTable = $('#vaccineTablePerLocation').DataTable({
     dom: 'Bfrtip',
         buttons: [
             
@@ -227,7 +225,7 @@ $(document).ready(function() {
         exportOptions: {
             columns: 'th:not(:last-child)'
          },
-    'ajax': base_url + 'Controller_Vaccine/fetchVaccinesData',
+    'ajax': base_url + 'Controller_Vaccine/fetchVaccinesDataPerLocation/'+vaccine_id,
     'order': []
   });
 
