@@ -7,7 +7,7 @@
   <!-- Content Header (Page header) -->
   <section class="content-header">
     <h1>
-      <?= $vaccine['description'] ?>
+     <?= $vaccine['description'] ?>
     </h1>
     <ol class="breadcrumb">
       <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -82,39 +82,31 @@
         <h4 class="modal-title">Add Vaccines</h4>
       </div>
 
-      <form role="form" action="<?php echo base_url('Controller_Vaccine/create') ?>" method="post" id="createForm">
-
+      <form role="form" action="<?php echo base_url('Controller_Vaccine/createVaccinePerLocation') ?>" method="post" id="createForm">
+      
         <div class="modal-body">
 
           <div class="form-group">
-            <label for="brand_name">Vaccine Description</label>
-            <input type="text" class="form-control" id="vaccine_name" name="vaccine_name" placeholder="Enter Vaccine Name" autocomplete="off">
+            <label for="brand_name">Clinic</label>
+            <input type="text" class="form-control" id="clinic_name" name="clinic_name" placeholder="Enter Clinic Name" autocomplete="off">
           </div>
           <div class="form-group">
-            <label for="brand_name">Quantity On-Hand</label>
-            <input type="text" class="form-control" id="vaccine_onhand" name="vaccine_onhand" placeholder="Enter Quantity On-Hand" autocomplete="off">
+            <label for="brand_name">Quantity</label>
+            <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Enter Quantity" autocomplete="off">
           </div>
 
           <div class="form-group">
-            <label for="brand_name">Quantity Requested</label>
-            <input type="text" class="form-control" id="vaccine_requested" name="vaccine_requested" placeholder="Enter Quantity Requested" autocomplete="off">
+            <label for="brand_name">Clinic Location</label>
+            <input type="text" class="form-control" id="clinic_location" name="clinic_location" placeholder="Enter Clinic Location" autocomplete="off">
           </div>
 
-          <div class="form-group">
-            <label for="brand_name">Quantity Issued</label>
-            <input type="text" class="form-control" id="vaccine_issued" name="vaccine_issued" placeholder="Enter Quantity Issued" autocomplete="off">
-          </div>
-
-          <div class="form-group">
-            <label for="brand_name">Remarks</label>
-            <input type="text" class="form-control" id="vaccine_remarks" name="vaccine_remarks" placeholder="Enter Remarks" autocomplete="off">
-          </div>
+         
 
          
         </div>
 
         <div class="modal-footer">
-          <button type="button" id="addVaccineCloseBtn" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" id="addVaccinePerLocationCloseBtn" class="btn btn-default" data-dismiss="modal">Close</button>
           <button type="submit" class="btn btn-primary">Save changes</button>
         </div>
 
@@ -139,28 +131,19 @@
         <div class="modal-body">
           <div id="messages"></div>
 
+          
           <div class="form-group">
-            <label for="edit_brand_name">Vaccine Name</label>
-            <input type="text" class="form-control" id="edit_vaccine_name" name="edit_vaccine_name" placeholder="Enter vaccine name" autocomplete="off">
+            <label for="brand_name">Clinic</label>
+            <input type="text" class="form-control" id="edit_clinic_name" name="edit_clinic_name" placeholder="Enter Clinic Name" autocomplete="off">
           </div>
           <div class="form-group">
-            <label for="brand_name">Quantity On-Hand</label>
-            <input type="text" class="form-control" id="edit_vaccine_onhand" name="edit_vaccine_onhand" placeholder="Enter Quantity On-Hand" autocomplete="off">
-          </div>
-
-          <div class="form-group">
-            <label for="brand_name">Quantity Requested</label>
-            <input type="text" class="form-control" id="edit_vaccine_requested" name="edit_vaccine_requested" placeholder="Enter Quantity Requested" autocomplete="off">
+            <label for="brand_name">Quantity</label>
+            <input type="text" class="form-control" id="edit_quantity" name="edit_quantity" placeholder="Enter Quantity" autocomplete="off">
           </div>
 
           <div class="form-group">
-            <label for="brand_name">Quantity Issued</label>
-            <input type="text" class="form-control" id="edit_vaccine_issued" name="edit_vaccine_issued" placeholder="Enter Quantity Issued" autocomplete="off">
-          </div>
-
-          <div class="form-group">
-            <label for="brand_name">Remarks</label>
-            <input type="text" class="form-control" id="edit_vaccine_remarks" name="edit_vaccine_remarks" placeholder="Enter Remarks" autocomplete="off">
+            <label for="brand_name">Clinic Location</label>
+            <input type="text" class="form-control" id="edit_clinic_location" name="edit_clinic_location" placeholder="Enter Clinic Location" autocomplete="off">
           </div>
           
         </div>
@@ -206,7 +189,7 @@
 <script type="text/javascript">
 var manageTable;
 var base_url = "<?php echo base_url(); ?>";
-var vaccine_id = "<?= $vaccine['id'] ?>";
+var vaccine_id = "<?= $this->uri->segment(3); ?> ";
 $(document).ready(function() {
   console.log('vaccine id:'+vaccine_id);
   
@@ -253,8 +236,8 @@ $(document).ready(function() {
 
 
           // hide the modal
-          $("#addVaccineCloseBtn").click();
-
+          $("#addVaccinePerLocationCloseBtn").click();
+          //$("#id").modal('hide')
           // reset the form
           $("#createForm")[0].reset();
           $("#createForm .form-group").removeClass('has-error').removeClass('has-success');
@@ -291,7 +274,84 @@ $(document).ready(function() {
 
 
 // edit function
+function editFunc2(id)
+{ 
+ 
+  $.ajax({
+    url: 'fetchVaccineDataPerLocationById/'+id,
+    type: 'post',
+    dataType: 'json',
+    success:function(response) {
+      console.log('xxx');
+      console.log(response);
+      $("#edit_clinic_name").val(response.description);
+      $("#edit_quantity").val(response.qty_onhand);
+      $("#edit_clinic_location").val(response.qty_requested);
 
+      // submit the edit from 
+      $("#updateForm").unbind('submit').bind('submit', function() {
+        var form = $(this);
+
+        // remove the text-danger
+        $(".text-danger").remove();
+
+        $.ajax({
+          url: form.attr('action') + '/' + id,
+          type: form.attr('method'),
+          data: form.serialize(), // /converting the form data into array and sending it to server
+          dataType: 'json',
+          success:function(response) {
+
+            manageTable.ajax.reload(null, false); 
+
+            if(response.success === true) {
+              $("#messages").html('<div class="alert alert-success alert-dismissible" role="alert">'+
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+                '<strong> <span class="glyphicon glyphicon-ok-sign"></span> </strong>'+response.messages+
+              '</div>');
+
+              
+              // hide the modal
+              //hideModal2('editModal');
+              $('#editVaccineCloseBtn').click();
+              // reset the form 
+              $("#updateForm .form-group").removeClass('has-error').removeClass('has-success');
+
+            } else {
+
+              if(response.messages instanceof Object) {
+                $.each(response.messages, function(index, value) {
+                  var id = $("#"+index);
+
+                  id.closest('.form-group')
+                  .removeClass('has-error')
+                  .removeClass('has-success')
+                  .addClass(value.length > 0 ? 'has-error' : 'has-success');
+                  
+                  id.after(value);
+
+                });
+              } else {
+                $("#messages").html('<div class="alert alert-warning alert-dismissible" role="alert">'+
+                  '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+                  '<strong> <span class="glyphicon glyphicon-exclamation-sign"></span> </strong>'+response.messages+
+                '</div>');
+              }
+            }
+          }
+        }); 
+
+        return false;
+      });
+
+    }
+  });
+}
+
+
+var testModalShow = () => {
+    $("#editModal").modal('show');
+}
 
 // remove functions 
 function removeFunc(id)

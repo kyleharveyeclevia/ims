@@ -63,7 +63,7 @@
 $viewData = $this->uri->segment(1);
 switch($viewData){
   case 'Controller_Vaccine':
-  echo '<script src="'.base_url('assets/javascripts/vaccines/vaccines.js').'"></script>';
+  //echo '<script src="'.base_url('assets/javascripts/vaccines/vaccines.js').'"></script>';
   break;
 
   default:

@@ -31,16 +31,36 @@ class Model_vaccines extends CI_Model
 
 	/*get vaccine data per location */
 	public function getVaccinesDataPerLocation($id = null)
+	{	
+		
+			$sql = "SELECT * FROM vaccines_per_location where vaccine_id = '$id'";
+			$query = $this->db->query($sql);
+			return $query->result_array();
+		
+	
+	}
+
+	public function getVaccinesData2($id = null)
 	{
-		/*if($id) {
-			$sql = "SELECT * FROM vaccines_per_location where vaccine_id = ?";
+		if($id) {
+			$sql = "SELECT * FROM vaccines_per_location where id = ?";
 			$query = $this->db->query($sql, array($id));
 			return $query->row_array();
-		}*/
+		}
 
-		$sql = "SELECT * FROM vaccines_per_location where vaccine_id = '$id'";
+		$sql = "SELECT * FROM vaccines_per_location";
 		$query = $this->db->query($sql);
 		return $query->result_array();
+	}
+
+	public function countTotalVaccineIssued($vaccine_id){
+		$query = "SELECT SUM(quantity) as total_issued FROM vaccines_per_location WHERE vaccine_id = '$vaccine_id'";
+		$result = $this->db->query($query)->result_array();
+		if($result){
+			return $result[0]['total_issued'];
+		} else {
+			return 0;
+		}
 	}
 
 	public function countAttributeValue($id = null)
@@ -72,6 +92,14 @@ class Model_vaccines extends CI_Model
 	{
 		if($data) {
 			$insert = $this->db->insert('vaccines', $data);
+			return ($insert == true) ? true : false;
+		}
+	}
+
+	public function insert_data($table_name,$data)
+	{
+		if($data) {
+			$insert = $this->db->insert($table_name, $data);
 			return ($insert == true) ? true : false;
 		}
 	}

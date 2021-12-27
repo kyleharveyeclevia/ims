@@ -16,7 +16,7 @@
 
 
           <?php if(in_array('createBrand', $user_permission) || in_array('updateBrand', $user_permission) || in_array('viewBrand', $user_permission) || in_array('deleteBrand', $user_permission)): ?>
-            <li id="brandNav">
+            <li id="brandNav" style="display:none">
               <a href="<?php echo base_url('Controller_Items/') ?>">
                 <i class="fa fa-cart-arrow-down"></i> <span>Items</span>
               </a>
@@ -24,7 +24,7 @@
           <?php endif; ?>
 
           <?php if(in_array('createCategory', $user_permission) || in_array('updateCategory', $user_permission) || in_array('viewCategory', $user_permission) || in_array('deleteCategory', $user_permission)): ?>
-            <li id="categoryNav">
+            <li id="categoryNav" style="display:none">
               <a href="<?php echo base_url('Controller_Category/') ?>">
                 <i class="fa fa-cubes"></i> <span>Category</span>
               </a>
@@ -32,7 +32,7 @@
           <?php endif; ?>
 
           <?php if(in_array('createStore', $user_permission) || in_array('updateStore', $user_permission) || in_array('viewStore', $user_permission) || in_array('deleteStore', $user_permission)): ?>
-            <li id="storeNav">
+            <li id="storeNav" style="display:none">
               <a href="<?php echo base_url('Controller_Warehouse/') ?>">
                 <i class="fa fa-institution"></i> <span>Warehouse</span>
               </a>
@@ -40,7 +40,7 @@
           <?php endif; ?>
 
           <?php if(in_array('createAttribute', $user_permission) || in_array('updateAttribute', $user_permission) || in_array('viewAttribute', $user_permission) || in_array('deleteAttribute', $user_permission)): ?>
-          <li id="attributeNav">
+          <li id="attributeNav" style="display:none">
             <a href="<?php echo base_url('Controller_Element/') ?>">
               <i class="far fa-copy"></i> <span>Elements</span>
             </a>
@@ -147,7 +147,7 @@
 
 
           <?php if(in_array('updateCompany', $user_permission)): ?>
-            <li id="companyNav"><a href="<?php echo base_url('Controller_Company/') ?>"><i class="fa fa-bank"></i> <span>Company</span></a></li>
+            <li id="companyNav" style="display:none"><a href="<?php echo base_url('Controller_Company/') ?>"><i class="fa fa-bank"></i> <span>Company</span></a></li>
           <?php endif; ?>
 
         <?php endif; ?>

@@ -47,6 +47,15 @@ class Controller_Vaccine extends Admin_Controller
 		}
 	}
 
+	public function fetchVaccineDataPerLocationById($id) 
+	{
+	
+		if($id) {
+			$data = $this->vaccines->getVaccinesData2($id);
+			echo json_encode($data);
+		}
+	}
+
 	/* 
 	* gets the attribute data from data and returns the attribute 
 	*/
@@ -59,7 +68,11 @@ class Controller_Vaccine extends Admin_Controller
 		foreach ($data as $key => $value) {
 
 		//	$count_attribute_value = $this->model_attributes->countAttributeValue($value['id']);
-			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccines_per_location/'.$value['id'].'').'">View Data</a>';
+		 	$countTotalVaccinesIssued = $this->vaccines->countTotalVaccineIssued($value['id']);
+			if(!$countTotalVaccinesIssued){
+				$countTotalVaccinesIssued = 0;
+			}
+			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccines_per_location/'.$value['id'].'').'">'.$countTotalVaccinesIssued.'</a>';
 			// button
 			$buttons = '
 			<button type="button" class="btn btn-warning btn-sm" onclick="editFunc('.$value['id'].')" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button>
@@ -91,7 +104,7 @@ class Controller_Vaccine extends Admin_Controller
 		//	$count_attribute_value = $this->model_attributes->countAttributeValue($value['id']);
 			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccines_per_location').'">1</a>';
 			// button
-			$buttons = '<button type="button" class="btn btn-warning btn-sm" onclick="editFunc('.$value['id'].')" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button>
+			$buttons = '<button type="button" class="btn btn-warning btn-sm" onclick="editFunc2('.$value['id'].')" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button>
 			<button type="button" class="btn btn-danger btn-sm" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal"><i class="fa fa-trash"></i></button>
 			
 			';
@@ -153,6 +166,49 @@ class Controller_Vaccine extends Admin_Controller
 
         echo json_encode($response);
 	}
+
+	public function createVaccinePerLocation()
+	{
+		if(!in_array('createAttribute', $this->permission)) {
+			redirect('dashboard', 'refresh');
+		}
+
+		$response = array();
+
+		$this->form_validation->set_rules('clinic_name', 'Clinic Name', 'trim|required');
+
+		$this->form_validation->set_error_delimiters('<p class="text-danger">','</p>');
+
+        if ($this->form_validation->run() == TRUE) {
+        	$data = array(
+        		'vaccine_id' => $this->input->post('vaccine_id'),
+        		'location' => $this->input->post('clinic_name'),	
+				'quantity' => $this->input->post('quantity'),	
+				'address' => $this->input->post('clinic_location')
+        	);
+
+        	$create = $this->vaccines->insert_data('vaccines_per_location',$data);
+        	if($create == true) {
+        		$response['success'] = true;
+        		$response['messages'] = 'Succesfully created';
+        	}
+        	else {
+        		$response['success'] = false;
+        		$response['messages'] = 'Error in the database while creating the brand information';			
+        	}
+        }
+        else {
+        	$response['success'] = false;
+        	foreach ($_POST as $key => $value) {
+        		$response['messages'][$key] = form_error($key);
+        	}
+        }
+
+        echo json_encode($response);
+	}
+
+
+	
 
 	/* 
 	* update the attribute value via attribute id 
