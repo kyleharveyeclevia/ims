@@ -113,6 +113,15 @@ class Model_vaccines extends CI_Model
 		}
 	}
 
+	public function update_table($table_name, $data, $id)
+	{
+		if($data && $id) {
+			$this->db->where('id', $id);
+			$update = $this->db->update($table_name, $data);
+			return ($update == true) ? true : false;
+		}
+	}
+
 	public function remove($id)
 	{
 		if($id) {

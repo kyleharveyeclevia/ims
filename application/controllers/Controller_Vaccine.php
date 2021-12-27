@@ -260,6 +260,53 @@ class Controller_Vaccine extends Admin_Controller
 		echo json_encode($response);
 	}
 
+
+	public function updateVaccinePerLocation($id)
+	{
+		if(!in_array('updateAttribute', $this->permission)) {
+			redirect('dashboard', 'refresh');
+		}
+
+		$response = array();
+
+		if($id) {
+			$this->form_validation->set_rules('edit_clinic_name', 'Clinic name', 'trim|required');
+
+			$this->form_validation->set_error_delimiters('<p class="text-danger">','</p>');
+
+	        if ($this->form_validation->run() == TRUE) {
+	        	$data = array(
+					'location' => $this->input->post('edit_clinic_name'),
+					'quantity' => $this->input->post('edit_quantity'),	
+					'address' => $this->input->post('edit_clinic_location'),	
+						
+				);
+
+	        	$update = $this->vaccines->update_table("vaccines_per_location", $data, $id);
+	        	if($update == true) {
+	        		$response['success'] = true;
+	        		$response['messages'] = 'Succesfully updated';
+	        	}
+	        	else {
+	        		$response['success'] = false;
+	        		$response['messages'] = 'Error in the database while updated the brand information';			
+	        	}
+	        }
+	        else {
+	        	$response['success'] = false;
+	        	foreach ($_POST as $key => $value) {
+	        		$response['messages'][$key] = form_error($key);
+	        	}
+	        }
+		}
+		else {
+			$response['success'] = false;
+    		$response['messages'] = 'Error please refresh the page again!!';
+		}
+
+		echo json_encode($response);
+	}
+
 	/* 
 	* remove the attribute value via attribute id 
 	*/

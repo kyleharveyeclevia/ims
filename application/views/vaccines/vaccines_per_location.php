@@ -126,7 +126,7 @@
         <h4 class="modal-title">Edit Vaccine</h4>
       </div>
 
-      <form role="form" action="<?php echo base_url('Controller_Vaccine/update') ?>" method="post" id="updateForm">
+      <form role="form" action="<?php echo base_url('Controller_Vaccine/updateVaccinePerLocation') ?>" method="post" id="updateForm">
 
         <div class="modal-body">
           <div id="messages"></div>
@@ -271,22 +271,31 @@ $(document).ready(function() {
 
 });
 
+function editFunctionNew(id){
+  $.ajax({
+    url: base_url+'Controller_Vaccine/fetchVaccineDataPerLocationById/'+id,
+    success:function(response){
+      // console.log();
 
+    }
+  })
+}
 
 // edit function
 function editFunc2(id)
 { 
  
   $.ajax({
-    url: 'fetchVaccineDataPerLocationById/'+id,
+    url:  base_url+'Controller_Vaccine/fetchVaccineDataPerLocationById/'+id,
     type: 'post',
     dataType: 'json',
     success:function(response) {
+    //  response = JSON.parse(response);
       console.log('xxx');
       console.log(response);
-      $("#edit_clinic_name").val(response.description);
-      $("#edit_quantity").val(response.qty_onhand);
-      $("#edit_clinic_location").val(response.qty_requested);
+      $("#edit_clinic_name").val(response.location);
+      $("#edit_quantity").val(response.quantity);
+      $("#edit_clinic_location").val(response.address);
 
       // submit the edit from 
       $("#updateForm").unbind('submit').bind('submit', function() {
@@ -345,6 +354,8 @@ function editFunc2(id)
       });
 
     }
+  }).fail(function( jqXHR, textStatus, errorThrown){
+    console.log(errorThrown);
   });
 }
 
