@@ -220,7 +220,7 @@
 
         <div class="modal-footer">
           <button type="button" id="receiveVaccineCloseBtn" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="submit" onlick ="receiveVaccine()" class="btn btn-primary">Receive Vaccine</button>
+          <button type="button" onlick ="receiveVaccine()" class="btn btn-primary">Receive Vaccine</button>
         </div>
 
       </form>
