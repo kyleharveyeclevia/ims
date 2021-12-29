@@ -59,18 +59,7 @@
   </script>
   <!-- Bootstrap 3.3.7 -->
   <script src="<?php echo base_url('assets/bower_components/bootstrap/dist/js/bootstrap.min.js') ?>"></script>
-  <?php 
-$viewData = $this->uri->segment(1);
-switch($viewData){
-  case 'Controller_Vaccine':
-  //echo '<script src="'.base_url('assets/javascripts/vaccines/vaccines.js').'"></script>';
-  break;
-
-  default:
-  echo 'defaukt';
-  break;
-}
- ?>
+ 
   <!-- Morris.js charts -->
   <script src="<?php echo base_url('assets/bower_components/raphael/raphael.min.js') ?>"></script>
   <script src="<?php echo base_url('assets/bower_components/morris.js/morris.min.js') ?>"></script>

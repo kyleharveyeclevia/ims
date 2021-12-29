@@ -126,7 +126,7 @@ class Model_vaccines extends CI_Model
 	{
 		if($id) {
 			$this->db->where('id', $id);
-			$delete = $this->db->delete('attributes');
+			$delete = $this->db->delete('vaccines');
 			return ($delete == true) ? true : false;
 		}
 	}
@@ -155,6 +155,11 @@ class Model_vaccines extends CI_Model
 			$delete = $this->db->delete('attribute_value');
 			return ($delete == true) ? true : false;
 		}
+	}
+
+	public function get_table_data($table_name){
+		$query = "SELECT * FROM $table_name";
+		return $this->db->query($query)->result_array();
 	}
 
 }

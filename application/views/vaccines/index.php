@@ -38,6 +38,7 @@
 
         <?php //if(in_array('createGroup', $user_permission)): ?>
           <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Add Vaccine</button>
+          <button class="btn btn-default" data-toggle="modal" onclick="createDropdown()" data-target="#receiveModal">Receive Vaccine</button>
           <br /> <br />
         <?php //endif; ?>
 
@@ -48,9 +49,11 @@
             <table id="vaccineTable" class="table table-bordered table-striped">
               <thead>
               <tr>
-                <th>Vaccine Description</th>
-                <th>Quantity</th>
+                <th>Vaccine</th>
+                <th>Total Quantity</th>
+                <th>Quantity On-Hand</th>
                 <th>Quantity Issued</th>
+                <th>Expiration Date </th>
                 <th>Remarks</th>
                 <?php //if(in_array('updateGroup', $user_permission) || in_array('deleteGroup', $user_permission)): ?>
                   <th>Action</th>
@@ -93,18 +96,14 @@
             <input type="text" class="form-control" id="vaccine_name" name="vaccine_name" placeholder="Enter Vaccine Name" autocomplete="off">
           </div>
           <div class="form-group">
-            <label for="brand_name">Quantity On-Hand</label>
+            <label for="brand_name">Quantity</label>
             <input type="text" class="form-control" id="vaccine_onhand" name="vaccine_onhand" placeholder="Enter Quantity On-Hand" autocomplete="off">
           </div>
 
-          <div class="form-group">
-            <label for="brand_name">Quantity Requested</label>
-            <input type="text" class="form-control" id="vaccine_requested" name="vaccine_requested" placeholder="Enter Quantity Requested" autocomplete="off">
-          </div>
 
           <div class="form-group">
-            <label for="brand_name">Quantity Issued</label>
-            <input type="text" class="form-control" id="vaccine_issued" name="vaccine_issued" placeholder="Enter Quantity Issued" autocomplete="off">
+            <label for="brand_name">Expiration Date</label>
+            <input type="date" class="form-control" id="vaccine_exp_date" name="vaccine_exp_date" placeholder="Enter Expiration Date" autocomplete="off">
           </div>
 
           <div class="form-group">
@@ -177,12 +176,12 @@
         <h4 class="modal-title">Remove Elements</h4>
       </div>
 
-      <form role="form" action="<?php echo base_url('Controller_Element/remove') ?>" method="post" id="removeForm">
+      <form role="form" action="<?php echo base_url('Controller_Vaccine/remove') ?>" method="post" id="removeForm">
         <div class="modal-body">
           <p>Do you really want to remove?</p>
         </div>
         <div class="modal-footer">
-          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" id="removeVaccineCloseBtn" class="btn btn-default" data-dismiss="modal">Close</button>
           <button type="submit" class="btn btn-danger">Delete</button>
         </div>
       </form>
@@ -192,6 +191,44 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+
+<!-- receive modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="receiveModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Receive Vaccine</h4>
+      </div>
+
+      <form role="form" action="<?php echo base_url('Controller_Vaccine/receive') ?>" method="post" id="receiveForm">
+
+        <div class="modal-body">
+          <div id="messages"></div>
+
+          <div class="form-group">
+            <label for="edit_brand_name">Vaccine Name</label>
+            <div id="vaccineNameContainer"></div>
+          </div>
+          <div class="form-group">
+            <label for="brand_name">Quantity</label>
+            <input type="number" class="form-control" id="receive_vaccine_onhand" name="receive_vaccine_onhand" placeholder="Enter Quantity On-Hand" autocomplete="off">
+          </div>
+         
+          
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="receiveVaccineCloseBtn" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" onlick ="receiveVaccine()" class="btn btn-primary">Receive Vaccine</button>
+        </div>
+
+      </form>
+
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 
 <script type="text/javascript">
@@ -207,15 +244,20 @@ $(document).ready(function() {
   // initialize the datatable 
   manageTable = $('#vaccineTable').DataTable({
     dom: 'Bfrtip',
-        buttons: [
-            
-                'copy', 'csv', 'excel', 'print'
-        
-            
-        ], 
+    buttons: [{
+        extend: 'excelHtml5',
+        text: 'Download Results',
+        className:'btn btn-default',
         exportOptions: {
-            columns: 'th:not(:last-child)'
-         },
+                columns: [0, 1, 2, 3, 4]
+        },
+        customize: function ( xlsx ) {
+          var sheet = xlsx.xl.worksheets['sheet1.xml'];
+          console.log(xlsx);
+          $('c[r=A1] t', sheet).text( 'Custom text' );
+      } 
+     }],
+    
     'ajax': base_url + 'Controller_Vaccine/fetchVaccinesData',
     'order': []
   });
@@ -389,7 +431,8 @@ function removeFunc(id)
             '</div>');
 
             // hide the modal
-            $("#removeModal").modal('hide');
+           // $("#removeModal").modal('hide');
+           $('#removeVaccineCloseBtn').click();
 
           } else {
 
@@ -404,6 +447,18 @@ function removeFunc(id)
       return false;
     });
   }
+}
+
+
+var createDropdown = () => {
+    $.ajax({
+      url: base_url+'Controller_Vaccine/createDropdown/vaccine',
+      success: function(res){
+        var parsedData = JSON.parse(res);
+        $("#vaccineNameContainer").html(parsedData.data);
+
+      }
+    })
 }
 
 

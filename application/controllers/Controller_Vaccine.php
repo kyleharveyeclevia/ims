@@ -27,7 +27,7 @@ class Controller_Vaccine extends Admin_Controller
 		$this->render_template('vaccines/index', $this->data);	
 	}
 
-	public function vaccines_per_location($vaccine_id){
+	public function vaccine_location($vaccine_id){
 		if(!in_array('viewAttribute', $this->permission)) {
 			redirect('dashboard', 'refresh');
 		}
@@ -66,25 +66,46 @@ class Controller_Vaccine extends Admin_Controller
 		$data = $this->vaccines->getVaccinesData();
 
 		foreach ($data as $key => $value) {
+			//date("d-m-Y", strtotime($originalDate)
+			$expiration_date = $value['expiration_date']?date("d-M-Y", strtotime($value['expiration_date'])):'No Expiration';
+			
+			//date checker
+			$badge = "";
+			if($value['expiration_date']){
+				$date_now = date("Y-m-d");
+				$expiration_date = date("Y-m-d", strtotime($expiration_date));
+				$date_diff = strtotime($expiration_date) - strtotime($date_now);
+				$total_diff = round($date_diff / (60 * 60 * 24));
+				if($total_diff > 0) {
+					if($total_diff < 11){
+						$badge = '<span class="label label-warning" title="Number of Days Until Expiration">'.$total_diff.'</span>';
+					} 
+				}else{
+					$badge = '<span class="label label-danger">Expired</span>';
+				}
+			}
+			
 
-		//	$count_attribute_value = $this->model_attributes->countAttributeValue($value['id']);
 		 	$countTotalVaccinesIssued = $this->vaccines->countTotalVaccineIssued($value['id']);
 			if(!$countTotalVaccinesIssued){
 				$countTotalVaccinesIssued = 0;
 			}
-			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccines_per_location/'.$value['id'].'').'">'.$countTotalVaccinesIssued.'</a>';
+
+			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccine_location/'.$value['id'].'').'">'.$countTotalVaccinesIssued.'</a>';
 			// button
 			$buttons = '
 			<button type="button" class="btn btn-warning btn-sm" onclick="editFunc('.$value['id'].')" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button>
 			<button type="button" class="btn btn-danger btn-sm" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal"><i class="fa fa-trash"></i></button>
 			';
-
-			//$status = ($value['active'] == 1) ? '<span class="label label-success">Active</span>' : '<span class="label label-warning">Inactive</span>';
-
+			
+			$vaccine_name = $value['sub_description']?'<b>'.$value['description'].'</b><br><p style="font-size:11px">'.$value['sub_description'].'</p>':'<b>'.$value['description'].'</b>';
+			$quantity_onhand = $value['qty_onhand'] - $countTotalVaccinesIssued;
 			$result['data'][$key] = array(
-				$value['description'],
+				$vaccine_name,
 				$value['qty_onhand'],
+				$quantity_onhand,
 				$quantity_issued,
+				$expiration_date.''.$badge,
                 $value['remarks'],
 				$buttons
 			);
@@ -142,8 +163,7 @@ class Controller_Vaccine extends Admin_Controller
         	$data = array(
         		'description' => $this->input->post('vaccine_name'),
         		'qty_onhand' => $this->input->post('vaccine_onhand'),	
-				'qty_requested' => $this->input->post('vaccine_requested'),	
-				'qty_issued' => $this->input->post('vaccine_issued'),	
+				'expiration_date' => $this->input->post('vaccine_exp_date'),	
 				'remarks' => $this->input->post('vaccine_remarks'),	
         	);
 
@@ -320,7 +340,7 @@ class Controller_Vaccine extends Admin_Controller
 
 		$response = array();
 		if($attribute_id) {
-			$delete = $this->model_attributes->remove($attribute_id);
+			$delete = $this->vaccines->remove($attribute_id);
 			if($delete == true) {
 				$response['success'] = true;
 				$response['messages'] = "Successfully removed";	
@@ -503,5 +523,29 @@ class Controller_Vaccine extends Admin_Controller
 
 		echo json_encode($response);
 	}
+
+
+	public function createDropdown($data){
+	 $result = array();
+	  switch($data){
+		  case 'vaccine':
+		  $result = $this->vaccines->get_table_data('vaccines');
+		  break;
+	  }
+
+
+	  $dropdown = "<select class='form-control' name='vaccine_name' id='vaccine_name'>";
+	  	foreach($result as $val){
+			  $vaccine = $val['description'];
+			  $vacc_id = $val['id'];
+			  $dropdown .= "<option value='$vacc_id'>$vaccine</option>";
+		}
+	  
+		  $dropdown .="</select>";
+
+ 		 echo json_encode(array("data" => $dropdown));
+	}
+
+
 
 }
