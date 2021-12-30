@@ -104,6 +104,8 @@ class Model_vaccines extends CI_Model
 		}
 	}
 
+	
+
 	public function update($data, $id)
 	{
 		if($data && $id) {
