@@ -205,14 +205,14 @@
 
         <div class="modal-body">
           <div id="messages"></div>
-
+            
           <div class="form-group">
             <label for="edit_brand_name">Vaccine Name</label>
             <div id="vaccineNameContainer"></div>
           </div>
           <div class="form-group">
             <label for="brand_name">Quantity</label>
-            <input type="number" class="form-control" id="receive_vaccine_onhand" name="receive_vaccine_onhand" placeholder="Enter Quantity On-Hand" autocomplete="off">
+            <input type="number" class="form-control" id="receive_vaccine_quantity" name="receive_vaccine_quantity" placeholder="Enter Quantity On-Hand" autocomplete="off">
           </div>
          
           
@@ -220,7 +220,7 @@
 
         <div class="modal-footer">
           <button type="button" id="receiveVaccineCloseBtn" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" onlick ="receiveVaccine()" class="btn btn-primary">Receive Vaccine</button>
+          <button type="button" onclick="receiveVaccine()" class="btn btn-primary">Receive Vaccine</button>
         </div>
 
       </form>
@@ -463,7 +463,19 @@ var createDropdown = () => {
 
 
 var receiveVaccine = () => {
-  console.log('hahahaha');
+  var receive_vaccine_id = $("#receive_vaccine_name").val();
+  console.log(receive_vaccine_id);
+
+  $.ajax({
+      url: base_url+'Controller_Vaccine/receive_vaccine/'+receive_vaccine_id,
+      type: "POST",
+      data: {receive_vaccine_quantity: $("#receive_vaccine_quantity").val()},
+      success: function(res){
+       
+
+      }
+    })
+
 }
 
 

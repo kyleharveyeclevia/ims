@@ -534,7 +534,7 @@ class Controller_Vaccine extends Admin_Controller
 	  }
 
 
-	  $dropdown = "<select class='form-control' name='vaccine_name' id='vaccine_name'>";
+	  $dropdown = "<select class='form-control' name='receive_vaccine_name' id='receive_vaccine_name'>";
 	  	foreach($result as $val){
 			  $vaccine = $val['description'];
 			  $vacc_id = $val['id'];
@@ -544,6 +544,28 @@ class Controller_Vaccine extends Admin_Controller
 		  $dropdown .="</select>";
 
  		 echo json_encode(array("data" => $dropdown));
+	}
+
+
+	public function receive_vaccine($vaccine_id){
+		//print_r($this->input->post('receive_vaccine_quantity'));
+		/*public function insert_data($table_name,$data)
+	{
+		if($data) {
+			$insert = $this->db->insert($table_name, $data);
+			return ($insert == true) ? true : false;
+		}
+	} */
+	$data = array(
+		'item' => "vaccine",
+		'vaccine_id' => $vaccine_id,	
+		'quantity' => $this->input->post('receive_vaccine_quantity'),	
+	);
+		$receive = $this->vaccines->insert_data("receiving_log",$data);
+		if($receive){
+			/*Update total quantity*/
+			$update_quantity = $this->vaccines->update_quantity("vaccines");
+		}
 	}
 
 
