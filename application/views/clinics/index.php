@@ -1,112 +1,278 @@
+<script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
+<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
 
 
-  <!-- Content Wrapper. Contains page content -->
-  <div class="content-wrapper">
-    <!-- Content Header (Page header) -->
-    <section class="content-header">
-      <h1>
-        Manage Company
+<!-- Content Wrapper. Contains page content -->
+<div class="content-wrapper">
+  <!-- Content Header (Page header) -->
+  <section class="content-header">
+    <h1>
+      Manage Clinics
      
-      </h1>
-      <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-        <li class="active">company</li>
-      </ol>
-    </section>
+    </h1>
+    <ol class="breadcrumb">
+      <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+      <li class="active">Clinics</li>
+    </ol>
+  </section>
 
-    <!-- Main content -->
-    <section class="content">
-      <!-- Small boxes (Stat box) -->
-      <div class="row">
-        <div class="col-md-12 col-xs-12">
-          
-          <?php if($this->session->flashdata('success')): ?>
-            <div class="alert alert-success alert-dismissible" role="alert">
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <?php echo $this->session->flashdata('success'); ?>
-            </div>
-          <?php elseif($this->session->flashdata('error')): ?>
-            <div class="alert alert-error alert-dismissible" role="alert">
-              <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <?php echo $this->session->flashdata('error'); ?>
-            </div>
-          <?php endif; ?>
+  <!-- Main content -->
+  <section class="content">
+    <!-- Small boxes (Stat box) -->
+    <div class="row">
+      <div class="col-md-12 col-xs-12">
 
-          <div class="box">
-            
-            <form role="form" action="<?php base_url('company/update') ?>" method="post">
-              <div class="box-body">
+        <div id="messages"></div>
 
-                <?php echo validation_errors(); ?>
-
-                <div class="form-group">
-                  <label for="company_name">Company Name</label>
-                  <input type="text" class="form-control" id="company_name" name="company_name" placeholder="Enter company name" value="<?php echo $company_data['company_name'] ?>" autocomplete="off">
-                </div>
-                <div class="form-group">
-                  <label for="service_charge_value">Charge Amount (%)</label>
-                  <input type="text" class="form-control" id="service_charge_value" name="service_charge_value" placeholder="Enter charge amount %" value="<?php echo $company_data['service_charge_value'] ?>" autocomplete="off">
-                </div>
-                <div class="form-group">
-                  <label for="vat_charge_value">Vat Charge (%)</label>
-                  <input type="text" class="form-control" id="vat_charge_value" name="vat_charge_value" placeholder="Enter vat charge %" value="<?php echo $company_data['vat_charge_value'] ?>" autocomplete="off">
-                </div>
-                <div class="form-group">
-                  <label for="address">Address</label>
-                  <input type="text" class="form-control" id="address" name="address" placeholder="Enter address" value="<?php echo $company_data['address'] ?>" autocomplete="off">
-                </div>
-                <div class="form-group">
-                  <label for="phone">Phone</label>
-                  <input type="text" class="form-control" id="phone" name="phone" placeholder="Enter phone" value="<?php echo $company_data['phone'] ?>" autocomplete="off">
-                </div>
-                <div class="form-group">
-                  <label for="country">Country</label>
-                  <input type="text" class="form-control" id="country" name="country" placeholder="Enter country" value="<?php echo $company_data['country'] ?>" autocomplete="off">
-                </div>
-                <div class="form-group">
-                  <label for="permission">Message</label>
-                  <textarea class="form-control" id="message" name="message">
-                     <?php echo $company_data['message'] ?>
-                  </textarea>
-                </div>
-                <div class="form-group">
-                  <label for="currency">Currency</label>
-                  <?php ?>
-                  <select class="form-control" id="currency" name="currency">
-                    <option value="">~~SELECT~~</option>
-
-                    <?php foreach ($currency_symbols as $k => $v): ?>
-                      <option value="<?php echo trim($k); ?>" <?php if($company_data['currency'] == $k) {
-                        echo "selected";
-                      } ?>><?php echo $k ?></option>
-                    <?php endforeach ?>
-                  </select>
-                </div>
-                
-              </div>
-              <!-- /.box-body -->
-
-              <div class="box-footer">
-                <button type="submit" class="btn btn-primary">Save Changes</button>
-              </div>
-            </form>
+        <?php if($this->session->flashdata('success')): ?>
+          <div class="alert alert-success alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <?php echo $this->session->flashdata('success'); ?>
           </div>
-          <!-- /.box -->
-        </div>
-        <!-- col-md-12 -->
-      </div>
-      <!-- /.row -->
-      
+        <?php elseif($this->session->flashdata('error')): ?>
+          <div class="alert alert-error alert-dismissible" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <?php echo $this->session->flashdata('error'); ?>
+          </div>
+        <?php endif; ?>
 
-    </section>
-    <!-- /.content -->
-  </div>
-  <!-- /.content-wrapper -->
+        <?php //if(in_array('createGroup', $user_permission)): ?>
+          <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Add Clinic</button>
+          <br /> <br />
+        <?php //endif; ?>
+
+        <div class="box">
+         
+          <!-- /.box-header -->
+          <div class="box-body">
+            <table id="manageTable" class="table table-bordered table-striped">
+              <thead>
+              <tr>
+                <th>Clinic Name</th>
+                <th>Clinic Address</th>
+                <?php //if(in_array('updateGroup', $user_permission) || in_array('deleteGroup', $user_permission)): ?>
+                  <th>Action</th>
+                <?php //endif; ?>
+              </tr>
+              </thead>
+
+            </table>
+          </div>
+          <!-- /.box-body -->
+        </div>
+        <!-- /.box -->
+      </div>
+      <!-- col-md-12 -->
+    </div>
+    <!-- /.row -->
+    
+
+  </section>
+  <!-- /.content -->
+</div>
+<!-- /.content-wrapper -->
+<?php include_once('modals/clinics_modal.php'); ?>
+
+
 
 <script type="text/javascript">
-  $(document).ready(function() {
-    $("#companyNav").addClass('active');
-    $("#message").wysihtml5();
-  });
-</script>
+var manageTable;
+var base_url = "<?php echo base_url(); ?>";
 
+$(document).ready(function() {
+
+  
+
+  $("#attributeNav").addClass('active');
+
+  // initialize the datatable 
+  manageTable = $('#manageTable').DataTable({
+    'ajax': base_url + 'Controller_Clinics/fetchClinicsData',
+    'order': []
+  });
+
+  // submit the create from 
+  $("#createForm").unbind('submit').on('submit', function() {
+    var form = $(this);
+
+    // remove the text-danger
+    $(".text-danger").remove();
+
+    $.ajax({
+      url: form.attr('action'),
+      type: form.attr('method'),
+      data: form.serialize(), // /converting the form data into array and sending it to server
+      dataType: 'json',
+      success:function(response) {
+
+        manageTable.ajax.reload(null, false); 
+
+        if(response.success === true) {
+          $("#messages").html('<div class="alert alert-success alert-dismissible" role="alert">'+
+            '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+            '<strong> <span class="glyphicon glyphicon-ok-sign"></span> </strong>'+response.messages+
+          '</div>');
+
+
+          // hide the modal
+          $("#addClinicCloseBtn").click();
+
+          // reset the form
+          $("#createForm")[0].reset();
+          $("#createForm .form-group").removeClass('has-error').removeClass('has-success');
+
+        } else {
+
+          if(response.messages instanceof Object) {
+            $.each(response.messages, function(index, value) {
+              var id = $("#"+index);
+
+              id.closest('.form-group')
+              .removeClass('has-error')
+              .removeClass('has-success')
+              .addClass(value.length > 0 ? 'has-error' : 'has-success');
+              
+              id.after(value);
+
+            });
+          } else {
+            $("#messages").html('<div class="alert alert-warning alert-dismissible" role="alert">'+
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+              '<strong> <span class="glyphicon glyphicon-exclamation-sign"></span> </strong>'+response.messages+
+            '</div>');
+          }
+        }
+      }
+    }); 
+
+    return false;
+  });
+
+});
+
+// edit function
+function editFunc(id)
+{ 
+  $.ajax({
+    url: 'fetchClinicDataById/'+id,
+    type: 'post',
+    dataType: 'json',
+    success:function(response) {
+
+      $("#edit_clinic_name").val(response.clinic_name);
+      $("#edit_clinic_address").val(response.clinic_address);
+
+      // submit the edit from 
+      $("#updateForm").unbind('submit').bind('submit', function() {
+        var form = $(this);
+
+        // remove the text-danger
+        $(".text-danger").remove();
+
+        $.ajax({
+          url: form.attr('action') + '/' + id,
+          type: form.attr('method'),
+          data: form.serialize(), // /converting the form data into array and sending it to server
+          dataType: 'json',
+          success:function(response) {
+
+            manageTable.ajax.reload(null, false); 
+
+            if(response.success === true) {
+              $("#messages").html('<div class="alert alert-success alert-dismissible" role="alert">'+
+                '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+                '<strong> <span class="glyphicon glyphicon-ok-sign"></span> </strong>'+response.messages+
+              '</div>');
+
+
+              // hide the modal
+              $("#updateClinicCloseBtn").click();
+              // reset the form 
+              $("#updateForm .form-group").removeClass('has-error').removeClass('has-success');
+
+            } else {
+
+              if(response.messages instanceof Object) {
+                $.each(response.messages, function(index, value) {
+                  var id = $("#"+index);
+
+                  id.closest('.form-group')
+                  .removeClass('has-error')
+                  .removeClass('has-success')
+                  .addClass(value.length > 0 ? 'has-error' : 'has-success');
+                  
+                  id.after(value);
+
+                });
+              } else {
+                $("#messages").html('<div class="alert alert-warning alert-dismissible" role="alert">'+
+                  '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+                  '<strong> <span class="glyphicon glyphicon-exclamation-sign"></span> </strong>'+response.messages+
+                '</div>');
+              }
+            }
+          }
+        }); 
+
+        return false;
+      });
+
+    }
+  });
+}
+
+// remove functions 
+function removeFunc(id)
+{
+  if(id) {
+    $("#removeForm").on('submit', function() {
+
+      var form = $(this);
+
+      // remove the text-danger
+      $(".text-danger").remove();
+
+      $.ajax({
+        url: form.attr('action'),
+        type: form.attr('method'),
+        data: { clinic_id:id }, 
+        dataType: 'json',
+        success:function(response) {
+
+          manageTable.ajax.reload(null, false); 
+
+          if(response.success === true) {
+            $("#messages").html('<div class="alert alert-success alert-dismissible" role="alert">'+
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+              '<strong> <span class="glyphicon glyphicon-ok-sign"></span> </strong>'+response.messages+
+            '</div>');
+
+            // hide the modal
+            $("#removeClinicCloseBtn").click();
+
+          } else {
+
+            $("#messages").html('<div class="alert alert-warning alert-dismissible" role="alert">'+
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+              '<strong> <span class="glyphicon glyphicon-exclamation-sign"></span> </strong>'+response.messages+
+            '</div>'); 
+          }
+        }
+      }); 
+
+      return false;
+    });
+  }
+}
+
+
+</script>
+<script type="text/javascript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.1/js/dataTables.buttons.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.flash.min.js"></script>
+
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/pdfmake.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.32/vfs_fonts.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.html5.min.js"></script>
+<script type="text/javascript" src="https://cdn.datatables.net/buttons/1.5.1/js/buttons.print.min.js"></script>

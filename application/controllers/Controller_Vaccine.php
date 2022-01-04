@@ -101,7 +101,6 @@ class Controller_Vaccine extends Admin_Controller
 			}
 
 			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccines_issued/'.$value['id'].'').'">'.$countTotalVaccinesIssued.'</a>';
-			$quantity_onhand = $value['total_quantity'] - $countTotalVaccinesIssued;
 			$quantity_received = '<a href="'.base_url('Controller_Vaccine/vaccines_received/'.$value['id'].'').'">'.$value['total_quantity'].'</a>';
 			// button
 			$buttons = '
@@ -119,7 +118,6 @@ class Controller_Vaccine extends Admin_Controller
 			  <li><a href="#" onclick="editFunc('.$value['id'].')" data-toggle="modal" data-target="#editModal">Edit</a></li>
 			  <li><a href="#" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal">Delete</a></li>
 			  <li><a href="#" data-toggle="modal" onclick="createDropdown('.$value['id'].')" data-target="#receiveModal">Receive Vaccine</a></li>
-			  <li><a href="#" data-toggle="modal" onclick="initIssueVaccineModal('.$value['id'].',\''.$value['description'].'\', '.$quantity_onhand.')" data-target="#issueVaccineModal">Issue Vaccine</a></li>
 			</ul>
 		  </div>';
 			$vaccine_name = $value['sub_description']?'<b>'.$value['description'].'</b><br><p style="font-size:11px">'.$value['sub_description'].'</p>':'<b>'.$value['description'].'</b>';
@@ -127,7 +125,6 @@ class Controller_Vaccine extends Admin_Controller
 			$result['data'][$key] = array(
 				$vaccine_name,
 				$quantity_received,
-				$quantity_onhand,
 				$quantity_issued,
 				//$expiration_date.''.$badge,
                 $value['remarks'],
@@ -172,21 +169,37 @@ class Controller_Vaccine extends Admin_Controller
 		$data = $this->vaccines->fetch_vaccine_data_byid("vaccines_received",$vaccine_id);
 		//print_r($data);
 		foreach ($data as $key => $value) {
+			//check if there are available quantity
 			
-			// button
-			$buttons = '<button type="button" class="btn btn-warning btn-sm" onclick="editFunc2('.$value['id'].')" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button>
-			<button type="button" class="btn btn-danger btn-sm" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal"><i class="fa fa-trash"></i></button>
+				
 			
-			';
 
-			$issueBtn = '<a href="#" class="btn btn-primary" data-toggle="modal" onclick="initIssueVaccineModal('.$value['id'].',\''.$value['description'].'\', '.$value['quantity'].')" data-target="#issueVaccineModal">Issue Vaccine</a>';
-			$expiration_date =  $value['expiration_date']? date_format(date_create($value['expiration_date']),"Y-M-d h:i:s a"):'-';
+			$issueBtn = '<a href="#" class="btn btn-primary" data-toggle="modal" onclick="initIssueVaccineModal('.$value['vaccine_id'].',\''.$value['description'].'\', '.$value['quantity'].', '.$value['id'].')" data-target="#issueVaccineModal">Issue Vaccine</a>';
+			$expiration_date =  ($value['expiration_date'] && $value['expiration_date'] != '0000-00-00')? date_format(date_create($value['expiration_date']),"Y-M-d h:i:s a"):'-';
+
+			//date checker
+			$badge = "";
+			if($expiration_date != '-'){
+				$date_now = date("Y-m-d");
+				$expiration_date = date("Y-m-d", strtotime($expiration_date));
+				$date_diff = strtotime($expiration_date) - strtotime($date_now);
+				$total_diff = round($date_diff / (60 * 60 * 24));
+				if($total_diff > 0) {
+					if($total_diff < 11){
+						$badge = '<span class="label label-warning" title="Number of Days Until Expiration">'.$total_diff.'</span>';
+					} 
+				}else{
+					$badge = '<span class="label label-danger">Expired</span>';
+					$issueBtn = '<a href="#" class="btn btn-danger" data-toggle="modal" onclick="initDisposeVaccineModal('.$value['vaccine_id'].',\''.$value['description'].'\', '.$value['quantity'].', '.$value['id'].')" data-target="#disposeVaccineModal">Dispose Vaccine</a>';
+				}
+			}
+
 			$result['data'][$key] = array(
 				//$value['clinic_name'],
 				$value['quantity'],
 				date_format(date_create($value['receive_date']),"Y-M-d h:i:s a"),
 				$value['received_by'],
-				$expiration_date,
+				$expiration_date.''.$badge,
 				$issueBtn
 				
 			);
@@ -214,6 +227,7 @@ class Controller_Vaccine extends Admin_Controller
         if ($this->form_validation->run() == TRUE) {
         	$data = array(
         		'description' => $this->input->post('vaccine_name'),
+				'sub_description' => $this->input->post('vaccine_description'),
 				'expiration_date' => $this->input->post('vaccine_exp_date'),	
 				'remarks' => $this->input->post('vaccine_remarks'),	
         	);
@@ -299,10 +313,8 @@ class Controller_Vaccine extends Admin_Controller
 
 	        if ($this->form_validation->run() == TRUE) {
 	        	$data = array(
-					'description' => $this->input->post('edit_vaccine_name'),
-					'total_quantity' => $this->input->post('edit_vaccine_onhand'),	
-					'qty_requested' => $this->input->post('edit_vaccine_requested'),	
-					'qty_issued' => $this->input->post('edit_vaccine_issued'),	
+					'description' => $this->input->post('edit_vaccine_name'),	
+					'sub_description' => $this->input->post('edit_vaccine_description'),	
 					'remarks' => $this->input->post('edit_vaccine_remarks'),	
 				);
 
@@ -625,6 +637,7 @@ class Controller_Vaccine extends Admin_Controller
 		$data = array(
 			'vaccine_id' => $vaccine_id,	
 			'quantity' => $this->input->post('receive_vaccine_quantity'),
+			'quantity_received' => $this->input->post('receive_vaccine_quantity'),
 			'received_by' => $this->session->userdata('fullname'),
 			'remarks' => $this->input->post('receive_vaccine_remarks'),
 			'expiration_date' => $this->input->post('rec_vaccine_exp_date')
@@ -633,7 +646,7 @@ class Controller_Vaccine extends Admin_Controller
 		$response = "";
 		if($receive){
 			/*Update total quantity*/
-			$update_quantity = $this->vaccines->update_quantity($data);
+			$update_quantity = $this->vaccines->update_quantity($data, "add");
 			$response = "success";
 		}
 
@@ -652,7 +665,38 @@ class Controller_Vaccine extends Admin_Controller
 		$issueNow = $this->vaccines->insert_data("vaccines_issued",$data);
 		$response = "";
 		if($issueNow){
-			$response = "success";
+			$update_quantity = $this->vaccines->update_quantity($data, "subtract");
+			$update_avail_quantity = $this->vaccines->update_available_quantity($data, "vaccines_received", "quantity", $this->input->post('received_column_id'));
+			if($update_avail_quantity){
+				$response = "success";
+			}else{
+				$response = "updateqtyfailed";
+			}
+			
+		}
+
+		echo json_encode(array("response" => $response));
+	}
+
+	public function processDisposeVaccine(){
+		$data = array(
+			'vaccine_id' => $this->input->post('dispose_vaccine_name'),	
+			'disposed_by' => $this->session->userdata('fullname'),
+			'remarks' => $this->input->post('dispose_vaccine_remarks'),
+			'quantity' => $this->input->post('dispose_quantity')
+		);
+
+		$issueNow = $this->vaccines->insert_data("vaccines_disposed",$data);
+		$response = "";
+		if($issueNow){
+			$update_quantity = $this->vaccines->update_quantity($data, "subtract");
+			$update_avail_quantity = $this->vaccines->update_available_quantity($data, "vaccines_received", "quantity", $this->input->post('received_column_id'));
+			if($update_avail_quantity){
+				$response = "success";
+			}else{
+				$response = "updateqtyfailed";
+			}
+			
 		}
 
 		echo json_encode(array("response" => $response));

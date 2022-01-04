@@ -155,7 +155,7 @@ $(document).ready(function() {
 
   // initialize the datatable 
   manageTable = $('#vaccineTablePerLocation').DataTable({
-    dom: 'Bfrtip',
+   /* dom: 'Bfrtip',
         buttons: [
             
                 'copy', 'csv', 'excel', 'print'
@@ -164,7 +164,7 @@ $(document).ready(function() {
         ], 
         exportOptions: {
             columns: 'th:not(:last-child)'
-         },
+         },*/
     'ajax': base_url + 'Controller_Vaccine/fetch_issued_vaccine/'+vaccine_id,
     'order': []
   });

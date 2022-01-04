@@ -55,6 +55,14 @@
           </li>
           <?php endif; ?>
 
+          <?php if(in_array('createAttribute', $user_permission) || in_array('updateAttribute', $user_permission) || in_array('viewAttribute', $user_permission) || in_array('deleteAttribute', $user_permission)): ?>
+          <li id="clinicNav">
+            <a href="<?php echo base_url('Controller_Clinics/') ?>">
+             <i class="fas fa-clinic-medical"></i> <span>Clinics</span>
+            </a>
+          </li>
+          <?php endif; ?>
+
           <?php if(in_array('createProduct', $user_permission) || in_array('updateProduct', $user_permission) || in_array('viewProduct', $user_permission) || in_array('deleteProduct', $user_permission)): ?>
             <li class="treeview" id="mainProductNav">
               <a href="#">

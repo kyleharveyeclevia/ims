@@ -9,7 +9,6 @@
   <section class="content-header">
     <h1>
       Manage Vaccines
-     
     </h1>
     <ol class="breadcrumb">
       <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
@@ -51,7 +50,6 @@
               <tr>
                 <th>Vaccine</th>
                 <th>Total Quantity</th>
-                <th>Quantity On-Hand</th>
                 <th>Quantity Issued</th>
                 <th>Remarks</th>
                 <?php //if(in_array('updateGroup', $user_permission) || in_array('deleteGroup', $user_permission)): ?>
@@ -181,9 +179,7 @@ function editFunc(id)
     success:function(response) {
 
       $("#edit_vaccine_name").val(response.description);
-      $("#edit_vaccine_onhand").val(response.qty_onhand);
-      $("#edit_vaccine_requested").val(response.qty_requested);
-      $("#edit_vaccine_issued").val(response.qty_issued);
+      $("#edit_vaccine_description").val(response.sub_description);
       $("#edit_vaccine_remarks").val(response.remarks);
 
       // submit the edit from 
@@ -339,51 +335,6 @@ var receiveVaccine = () => {
 }
 
 
-var initIssueVaccineModal = (vaccine_id, vaccine_name, max_qty) => {
-  console.log(vaccine_name);
-  $.ajax({
-      url: base_url+'Controller_Vaccine/createDropdown/clinics',
-      success: function(res){
-        var parsedData = JSON.parse(res);
-        $("#VaccineName").html('Issue ' +vaccine_name);
-        $("#issue_quantity").attr({'max': max_qty, "placeholder": "Enter Quantity (Available : "+max_qty+")"});
-        $("#clinicDropdownContainer").html(parsedData.data);
-        $("#issue_vaccineIDContainer").html(`<input type='hidden' id='issue_vaccine_name' name='issue_vaccine_name' value = '`+vaccine_id+`'></input>`);
-      }
-    })
-}
-
-
-  var validateNubmerInput = (val, max, id) => {
-  // if input is greater than max, then reset the value to max
-    val = parseInt(val);
-      max = parseInt(max);
-      if(val > max){
-        $("#"+id).val(max);
-      } 
-  }
-
-  var processIssueVaccine = () => {
-    console.log($("#issueVaccineForm").serialize());
-    $.ajax({
-      url: base_url+'Controller_Vaccine/proccessIssueVaccine',
-      data: $("#issueVaccineForm").serialize(),
-      type: "POST",
-      dataType: 'json',
-      success: function(res){
-        if(res.response == 'success'){
-          $("#issueVaccineCloseBtn").click();
-          manageTable.ajax.reload(null, false); 
-          $("#messages").html('<div class="alert alert-success alert-dismissible" role="alert">'+
-              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
-              '<strong> <span class="glyphicon glyphicon-ok-sign"></span> </strong> Vaccine was successfully issued!</div>');
-        } else {
-          alert("Something went wrong, please refresh tha page");
-        }
-      }
-    })
-    
-  }
 
 
 </script>

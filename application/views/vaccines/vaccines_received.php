@@ -142,7 +142,82 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
+<!--issue vaccine modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="issueVaccineModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="VaccineName"></h4>
+      </div>
 
+      <form role="form" action="" method="post" id="issueVaccineForm">
+      
+        <div class="modal-body">
+        <div id="issue_vaccineIDContainer"></div>  
+        <div id="issue_columnIDContainer"></div>
+          <div class="form-group">
+            <label for="brand_name">Clinic</label>
+            <div id="clinicDropdownContainer"></div>
+          </div>
+          <div class="form-group">
+            <label for="issue_quantity">Quantity</label>
+            <input type="number" class="form-control"   oninput="validateNubmerInput(this.value, this.max, this.id)" id="issue_quantity" name="issue_quantity" placeholder="Enter Quantity" autocomplete="off">
+          </div>  
+          <div class="form-group">
+            <label for="#issue_vaccine_remarks">Remarks</label>
+            <input type="text" class="form-control" id="issue_vaccine_remarks" name="issue_vaccine_remarks" placeholder="Enter Remarks" autocomplete="off">
+          </div>       
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="issueVaccineCloseBtn" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" onclick="processIssueVaccine()" class="btn btn-primary">Save changes</button>
+        </div>
+
+      </form>
+
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!--dispose vaccine modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="disposeVaccineModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title" id="DisposeVaccineName"></h4>
+      </div>
+
+      <form role="form" action="" method="post" id="disposeVaccineForm">
+      
+        <div class="modal-body">
+        <div id="dispose_vaccineIDContainer"></div>  
+        <div id="dispose_columnIDContainer"></div>
+         
+          <div class="form-group">
+            <label for="issue_quantity">Quantity</label>
+            <input type="number" class="form-control"   oninput="validateNubmerInput(this.value, this.max, this.id)" id="dispose_quantity" name="dispose_quantity" placeholder="Enter Quantity" autocomplete="off">
+          </div>  
+          <div class="form-group">
+            <label for="#issue_vaccine_remarks">Remarks</label>
+            <input type="text" class="form-control" id="dispose_vaccine_remarks" name="dispose_vaccine_remarks" placeholder="Enter Remarks" autocomplete="off">
+          </div>       
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="disposeVaccineCloseBtn" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="button" onclick="processDisposeVaccine()" class="btn btn-primary">Save changes</button>
+        </div>
+
+      </form>
+
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
 
 <script type="text/javascript">
 var manageTable;
@@ -365,6 +440,93 @@ function removeFunc(id)
     });
   }
 }
+
+
+
+var initIssueVaccineModal = (vaccine_id, vaccine_name, max_qty, column_id) => {
+  console.log(vaccine_id);
+  $.ajax({
+      url: base_url+'Controller_Vaccine/createDropdown/clinics',
+      success: function(res){
+        var parsedData = JSON.parse(res);
+        $("#VaccineName").html('Issue ' +vaccine_name);
+        $("#issue_quantity").attr({'max': max_qty, "placeholder": "Enter Quantity (Available : "+max_qty+")"});
+        $("#clinicDropdownContainer").html(parsedData.data);
+        $("#issue_vaccineIDContainer").html(`<input type='hidden' id='issue_vaccine_name' name='issue_vaccine_name' value = '`+vaccine_id+`'></input>`);
+        $("#issue_columnIDContainer").html(`<input type='hidden' id='received_column_id' name='received_column_id' value = '`+column_id+`'></input>`);
+      }
+    })
+}
+
+var initDisposeVaccineModal = (vaccine_id, vaccine_name, max_qty, column_id) => {
+  console.log(vaccine_name);
+  $("#DisposeVaccineName").html('Dispose ' +vaccine_name);
+  $("#dispose_quantity").attr({'max': max_qty, "placeholder": "Enter Quantity (Available : "+max_qty+")"});
+  $("#dispose_vaccineIDContainer").html(`<input type='hidden' id='dispose_vaccine_name' name='dispose_vaccine_name' value = '`+vaccine_id+`'></input>`);
+  $("#dispose_columnIDContainer").html(`<input type='hidden' id='received_column_id' name='received_column_id' value = '`+column_id+`'></input>`);
+ 
+}
+
+
+
+ 
+
+var processIssueVaccine = () => {
+    console.log($("#issueVaccineForm").serialize());
+    $.ajax({
+      url: base_url+'Controller_Vaccine/proccessIssueVaccine',
+      data: $("#issueVaccineForm").serialize(),
+      type: "POST",
+      dataType: 'json',
+      success: function(res){
+        if(res.response == 'success'){
+          $("#issueVaccineCloseBtn").click();
+          manageTable.ajax.reload(null, false); 
+          $("#messages").html('<div class="alert alert-success alert-dismissible" role="alert">'+
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+              '<strong> <span class="glyphicon glyphicon-ok-sign"></span> </strong> Vaccine was successfully issued!</div>');
+        } else if (res.response == 'updateqtyfailed'){
+          alert("Something went while updating the quantity, please call the IT Support for them to check the issue");
+        } else {
+          alert("Something went wrong, please refresh tha page");
+        }
+      }
+    })
+    
+  }
+
+  var processDisposeVaccine = () => {
+    console.log($("#issueVaccineForm").serialize());
+    $.ajax({
+      url: base_url+'Controller_Vaccine/processDisposeVaccine',
+      data: $("#disposeVaccineForm").serialize(),
+      type: "POST",
+      dataType: 'json',
+      success: function(res){
+        if(res.response == 'success'){
+          $("#disposeVaccineCloseBtn").click();
+          manageTable.ajax.reload(null, false); 
+          $("#messages").html('<div class="alert alert-success alert-dismissible" role="alert">'+
+              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
+              '<strong> <span class="glyphicon glyphicon-ok-sign"></span> </strong> Vaccine was successfully issued!</div>');
+        } else if (res.response == 'updateqtyfailed'){
+          alert("Something went while updating the quantity, please call the IT Support for them to check the issue");
+        } else {
+          alert("Something went wrong, please refresh tha page");
+        }
+      }
+    })
+    
+  }
+
+var validateNubmerInput = (val, max, id) => {
+  // if input is greater than max, then reset the value to max
+    val = parseInt(val);
+      max = parseInt(max);
+      if(val > max){
+        $("#"+id).val(max);
+      } 
+  }
 
 
 </script>

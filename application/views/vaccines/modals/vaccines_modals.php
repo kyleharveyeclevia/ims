@@ -14,16 +14,16 @@
         <div class="modal-body">
 
           <div class="form-group">
-            <label for="brand_name">Vaccine Description</label>
+            <label for="brand_name">Vaccine Name</label>
             <input type="text" class="form-control" id="vaccine_name" name="vaccine_name" placeholder="Enter Vaccine Name" autocomplete="off">
           </div>
          
-
-
           <div class="form-group">
-            <label for="brand_name">Expiration Date</label>
-            <input type="date" class="form-control" id="vaccine_exp_date" name="vaccine_exp_date" placeholder="Enter Expiration Date" autocomplete="off">
+            <label for="brand_name">Vaccine Description</label>
+            <input type="text" class="form-control" id="vaccine_description" name="vaccine_description" placeholder="Enter Vaccine Description" autocomplete="off">
           </div>
+
+       
 
           <div class="form-group">
             <label for="brand_name">Remarks</label>
@@ -63,10 +63,12 @@
             <label for="edit_brand_name">Vaccine Name</label>
             <input type="text" class="form-control" id="edit_vaccine_name" name="edit_vaccine_name" placeholder="Enter vaccine name" autocomplete="off">
           </div>
+
           <div class="form-group">
-            <label for="brand_name">Quantity On-Hand</label>
-            <input type="text" class="form-control" id="edit_vaccine_onhand" name="edit_vaccine_onhand" placeholder="Enter Quantity On-Hand" autocomplete="off">
+            <label for="brand_name">Vaccine Description</label>
+            <input type="text" class="form-control" id="edit_vaccine_description" name="edit_vaccine_description" placeholder="Enter Vaccine Description" autocomplete="off">
           </div>
+
           <div class="form-group">
             <label for="brand_name">Remarks</label>
             <input type="text" class="form-control" id="edit_vaccine_remarks" name="edit_vaccine_remarks" placeholder="Enter Remarks" autocomplete="off">
@@ -92,7 +94,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Remove Elements</h4>
+        <h4 class="modal-title">Remove Vaccine</h4>
       </div>
 
       <form role="form" action="<?php echo base_url('Controller_Vaccine/remove') ?>" method="post" id="removeForm">
@@ -156,42 +158,5 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<!--issue vaccine modal -->
-<div class="modal fade" tabindex="-1" role="dialog" id="issueVaccineModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title" id="VaccineName"></h4>
-      </div>
 
-      <form role="form" action="" method="post" id="issueVaccineForm">
-      
-        <div class="modal-body">
-        <div id="issue_vaccineIDContainer"></div>  
-          <div class="form-group">
-            <label for="brand_name">Clinic</label>
-            <div id="clinicDropdownContainer"></div>
-          </div>
-          <div class="form-group">
-            <label for="issue_quantity">Quantity</label>
-            <input type="number" class="form-control"   oninput="validateNubmerInput(this.value, this.max, this.id)" id="issue_quantity" name="issue_quantity" placeholder="Enter Quantity" autocomplete="off">
-          </div>  
-          <div class="form-group">
-            <label for="#issue_vaccine_remarks">Remarks</label>
-            <input type="text" class="form-control" id="issue_vaccine_remarks" name="issue_vaccine_remarks" placeholder="Enter Remarks" autocomplete="off">
-          </div>       
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" id="issueVaccineCloseBtn" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="button" onclick="processIssueVaccine()" class="btn btn-primary">Save changes</button>
-        </div>
-
-      </form>
-
-
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
 

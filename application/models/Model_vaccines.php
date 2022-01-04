@@ -23,7 +23,7 @@ class Model_vaccines extends CI_Model
 			$query = $this->db->query($sql, array($id));
 			return $query->row_array();
 		}
-
+	//	$sql = "SELECT V.*, VD.total_quantity as available_quantity  FROM vaccines as V LEFT JOIN (SELECT SUM(quantity) as total_quantity,vaccine_id FROM vaccines_received WHERE quantity <> 0 GROUP by vaccine_id) as VD ON VD.vaccine_id = V.id";
 		$sql = "SELECT * FROM vaccines";
 		$query = $this->db->query($sql);
 		return $query->result_array();
@@ -50,7 +50,7 @@ class Model_vaccines extends CI_Model
 
 			case 'vaccines_received':
 				$sql ="SELECT VR.*, V.description FROM $table as VR LEFT JOIN vaccines as V ON V.id = VR.vaccine_id
-				where VR.vaccine_id = '$id' ORDER BY expiration_date ASC";
+				where VR.vaccine_id = '$id'  AND quantity <> 0 ORDER BY expiration_date ASC";
 			break;
 		}
 			
@@ -182,13 +182,32 @@ class Model_vaccines extends CI_Model
 		return $this->db->query($query)->result_array();
 	}
 
-	public function update_quantity($data){
+	public function update_quantity($data, $action){
 	//	print_r($data);
+		switch($action){
+			case "add":
+			$operator = "+";
+			break;
+
+			case "subtract":
+			$operator = "-";
+			break;
+		}
+
 		$vaccine_id = $data['vaccine_id'];
 		$quantity = $data['quantity'];
-		$query = "UPDATE vaccines SET total_quantity = total_quantity + $quantity WHERE id = '$vaccine_id'";
+		$query = "UPDATE vaccines SET total_quantity = total_quantity $operator $quantity WHERE id = '$vaccine_id'";
 		$this->db->query($query);
 		return $this->db->affected_rows();
+	}
+
+	public function update_available_quantity($data, $table_name, $column, $id){
+		$vaccine_id = $data['vaccine_id'];
+		$quantity_issued = $data['quantity']; 
+		$query = "UPDATE $table_name SET $column = $column - $quantity_issued WHERE id = '$id'";
+		$this->db->query($query);
+		return $this->db->affected_rows();
+
 	}
 
 	public function get_table_data_byid($table,$column,$id){
