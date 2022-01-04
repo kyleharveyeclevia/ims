@@ -37,7 +37,7 @@
         <?php endif; ?>
 
         <?php //if(in_array('createGroup', $user_permission)): ?>
-          <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Add Vaccine</button>
+        <!--  <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Add Vaccine</button>-->
           <br /> <br />
         <?php //endif; ?>
 
@@ -45,15 +45,14 @@
          
           <!-- /.box-header -->
           <div class="box-body">
-            <table id="vaccineTablePerLocation" class="table table-bordered table-striped">
+            <table id="vaccinesReceivedTable" class="table table-bordered table-striped">
               <thead>
               <tr>
-                <th>Clinic</th>
                 <th>Quantity</th>
-                <th>Clinic Location</th>
-                <?php //if(in_array('updateGroup', $user_permission) || in_array('deleteGroup', $user_permission)): ?>
-                  <th>Action</th>
-                <?php //endif; ?>
+                <th>Date Received</th>
+                <th>Received By</th>
+                <th>Expiration Date</th>
+                <th>Action</th>
               </tr>
               </thead>
 
@@ -74,49 +73,7 @@
 <!-- /.content-wrapper -->
 
 
-<!-- create brand modal -->
-<div class="modal fade" tabindex="-1" role="dialog" id="addModal">
-  <div class="modal-dialog" role="document">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Add Vaccines</h4>
-      </div>
 
-      <form role="form" action="<?php echo base_url('Controller_Vaccine/createVaccinePerLocation') ?>" method="post" id="createForm">
-      
-        <div class="modal-body">
-
-          <div class="form-group">
-            <label for="brand_name">Clinic</label>
-            <input type="text" class="form-control" id="clinic_name" name="clinic_name" placeholder="Enter Clinic Name" autocomplete="off">
-          </div>
-          <div class="form-group">
-            <label for="brand_name">Quantity</label>
-            <input type="text" class="form-control" id="quantity" name="quantity" placeholder="Enter Quantity" autocomplete="off">
-          </div>
-
-          <div class="form-group">
-            <label for="brand_name">Clinic Location</label>
-            <input type="text" class="form-control" id="clinic_location" name="clinic_location" placeholder="Enter Clinic Location" autocomplete="off">
-          </div>
-
-         
-
-         
-        </div>
-
-        <div class="modal-footer">
-          <button type="button" id="addVaccinePerLocationCloseBtn" class="btn btn-default" data-dismiss="modal">Close</button>
-          <button type="submit" class="btn btn-primary">Save changes</button>
-        </div>
-
-      </form>
-
-
-    </div><!-- /.modal-content -->
-  </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
 
 <!-- edit brand modal -->
 <div class="modal fade" tabindex="-1" role="dialog" id="editModal">
@@ -198,8 +155,8 @@ $(document).ready(function() {
   $("#vaccineNav").addClass('active');
 
   // initialize the datatable 
-  manageTable = $('#vaccineTablePerLocation').DataTable({
-    dom: 'Bfrtip',
+  manageTable = $('#vaccinesReceivedTable').DataTable({
+  /*  dom: 'Bfrtip',
         buttons: [
             
                 'copy', 'csv', 'excel', 'print'
@@ -208,8 +165,8 @@ $(document).ready(function() {
         ], 
         exportOptions: {
             columns: 'th:not(:last-child)'
-         },
-    'ajax': base_url + 'Controller_Vaccine/fetchVaccinesDataPerLocation/'+vaccine_id,
+         },*/
+    'ajax': base_url + 'Controller_Vaccine/fetch_received_vaccine/'+vaccine_id,
     'order': []
   });
 

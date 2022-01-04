@@ -27,13 +27,22 @@ class Controller_Vaccine extends Admin_Controller
 		$this->render_template('vaccines/index', $this->data);	
 	}
 
-	public function vaccine_location($vaccine_id){
+	public function vaccines_issued($vaccine_id){
 		if(!in_array('viewAttribute', $this->permission)) {
 			redirect('dashboard', 'refresh');
 		}
 		$this->data['vaccine'] =  $this->vaccines->getVaccinesData($vaccine_id);
 		//print_r($this->data['vaccine'] );
-		$this->render_template('vaccines/vaccines_per_location', $this->data);	
+		$this->render_template('vaccines/vaccines_issued', $this->data);	
+	}
+
+	public function vaccines_received($vaccine_id){
+		if(!in_array('viewAttribute', $this->permission)) {
+			redirect('dashboard', 'refresh');
+		}
+		$this->data['vaccine'] =  $this->vaccines->getVaccinesData($vaccine_id);
+		//print_r($this->data['vaccine'] );
+		$this->render_template('vaccines/vaccines_received', $this->data);	
 	}
 
 	/* 
@@ -91,21 +100,36 @@ class Controller_Vaccine extends Admin_Controller
 				$countTotalVaccinesIssued = 0;
 			}
 
-			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccine_location/'.$value['id'].'').'">'.$countTotalVaccinesIssued.'</a>';
+			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccines_issued/'.$value['id'].'').'">'.$countTotalVaccinesIssued.'</a>';
+			$quantity_onhand = $value['total_quantity'] - $countTotalVaccinesIssued;
+			$quantity_received = '<a href="'.base_url('Controller_Vaccine/vaccines_received/'.$value['id'].'').'">'.$value['total_quantity'].'</a>';
 			// button
 			$buttons = '
 			<button type="button" class="btn btn-warning btn-sm" onclick="editFunc('.$value['id'].')" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button>
 			<button type="button" class="btn btn-danger btn-sm" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal"><i class="fa fa-trash"></i></button>
-			';
+			<button class="btn btn-default" data-toggle="modal" onclick="createDropdown()" data-target="#receiveModal">Receive Vaccine</button>';
 			
+
+			$buttons = '<div class="dropdown">
+			<button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
+			  <i class="fa fa-cog"></i>
+			  
+			</button>
+			<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
+			  <li><a href="#" onclick="editFunc('.$value['id'].')" data-toggle="modal" data-target="#editModal">Edit</a></li>
+			  <li><a href="#" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal">Delete</a></li>
+			  <li><a href="#" data-toggle="modal" onclick="createDropdown('.$value['id'].')" data-target="#receiveModal">Receive Vaccine</a></li>
+			  <li><a href="#" data-toggle="modal" onclick="initIssueVaccineModal('.$value['id'].',\''.$value['description'].'\', '.$quantity_onhand.')" data-target="#issueVaccineModal">Issue Vaccine</a></li>
+			</ul>
+		  </div>';
 			$vaccine_name = $value['sub_description']?'<b>'.$value['description'].'</b><br><p style="font-size:11px">'.$value['sub_description'].'</p>':'<b>'.$value['description'].'</b>';
-			$quantity_onhand = $value['qty_onhand'] - $countTotalVaccinesIssued;
+	
 			$result['data'][$key] = array(
 				$vaccine_name,
-				$value['qty_onhand'],
+				$quantity_received,
 				$quantity_onhand,
 				$quantity_issued,
-				$expiration_date.''.$badge,
+				//$expiration_date.''.$badge,
                 $value['remarks'],
 				$buttons
 			);
@@ -114,29 +138,57 @@ class Controller_Vaccine extends Admin_Controller
 		echo json_encode($result);
 	}
 
-	public function fetchVaccinesDataPerLocation($vaccine_id){
+	public function fetch_issued_vaccine($vaccine_id){
 
 		$result = array('data' => array());
 
-		$data = $this->vaccines->getVaccinesDataPerLocation($vaccine_id);
+		$data = $this->vaccines->fetch_vaccine_data_byid("vaccines_issued",$vaccine_id);
 		//print_r($data);
 		foreach ($data as $key => $value) {
 			
-		//	$count_attribute_value = $this->model_attributes->countAttributeValue($value['id']);
-			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccines_per_location').'">1</a>';
+			// button
+			$buttons = '<button type="button" class="btn btn-warning btn-sm" onclick="editFunc2('.$value['id'].')" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button>
+			<button type="button" class="btn btn-danger btn-sm" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal"><i class="fa fa-trash"></i></button>
+			
+			';
+			
+			$result['data'][$key] = array(
+				$value['clinic_name'],
+				$value['quantity'],
+				date_format(date_create($value['issued_date']),"Y-M-d h:i:s a"),
+				$value['issued_by']
+				
+			);
+		} // /foreach
+
+		echo json_encode($result);
+
+	}
+
+	public function fetch_received_vaccine($vaccine_id){
+
+		$result = array('data' => array());
+
+		$data = $this->vaccines->fetch_vaccine_data_byid("vaccines_received",$vaccine_id);
+		//print_r($data);
+		foreach ($data as $key => $value) {
+			
 			// button
 			$buttons = '<button type="button" class="btn btn-warning btn-sm" onclick="editFunc2('.$value['id'].')" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button>
 			<button type="button" class="btn btn-danger btn-sm" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal"><i class="fa fa-trash"></i></button>
 			
 			';
 
-			//$status = ($value['active'] == 1) ? '<span class="label label-success">Active</span>' : '<span class="label label-warning">Inactive</span>';
-			
+			$issueBtn = '<a href="#" class="btn btn-primary" data-toggle="modal" onclick="initIssueVaccineModal('.$value['id'].',\''.$value['description'].'\', '.$value['quantity'].')" data-target="#issueVaccineModal">Issue Vaccine</a>';
+			$expiration_date =  $value['expiration_date']? date_format(date_create($value['expiration_date']),"Y-M-d h:i:s a"):'-';
 			$result['data'][$key] = array(
-				$value['location'],
+				//$value['clinic_name'],
 				$value['quantity'],
-                $value['address'],
-				$buttons
+				date_format(date_create($value['receive_date']),"Y-M-d h:i:s a"),
+				$value['received_by'],
+				$expiration_date,
+				$issueBtn
+				
 			);
 		} // /foreach
 
@@ -162,7 +214,6 @@ class Controller_Vaccine extends Admin_Controller
         if ($this->form_validation->run() == TRUE) {
         	$data = array(
         		'description' => $this->input->post('vaccine_name'),
-        		'qty_onhand' => $this->input->post('vaccine_onhand'),	
 				'expiration_date' => $this->input->post('vaccine_exp_date'),	
 				'remarks' => $this->input->post('vaccine_remarks'),	
         	);
@@ -249,7 +300,7 @@ class Controller_Vaccine extends Admin_Controller
 	        if ($this->form_validation->run() == TRUE) {
 	        	$data = array(
 					'description' => $this->input->post('edit_vaccine_name'),
-					'qty_onhand' => $this->input->post('edit_vaccine_onhand'),	
+					'total_quantity' => $this->input->post('edit_vaccine_onhand'),	
 					'qty_requested' => $this->input->post('edit_vaccine_requested'),	
 					'qty_issued' => $this->input->post('edit_vaccine_issued'),	
 					'remarks' => $this->input->post('edit_vaccine_remarks'),	
@@ -526,46 +577,85 @@ class Controller_Vaccine extends Admin_Controller
 
 
 	public function createDropdown($data){
-	 $result = array();
+	
+	  $result = array();
 	  switch($data){
+		  
 		  case 'vaccine':
 		  $result = $this->vaccines->get_table_data('vaccines');
+
+		  $dropdown = "<select class='form-control' name='receive_vaccine_name' id='receive_vaccine_name'>";
+			
+		  foreach($result as $val){
+			$vaccine = $val['description'];
+			$vacc_id = $val['id'];
+			$dropdown .= "<option value='$vacc_id'>$vaccine</option>";
+		  }
+		
+
 		  break;
+
+		  case 'clinics':
+		  $result = $this->vaccines->get_table_data('clinics');
+
+		  $dropdown = "<select class='form-control' name='issue_clinic_name' id='issue_clinic_name'>";
+			
+		  foreach($result as $val){
+			$clinic = $val['clinic_name'];
+			$clinic_id = $val['id'];
+			$dropdown .= "<option value='$clinic_id'>$clinic</option>";
+		  }
+
+		  break;
+		
+		 
 	  }
 
+	  $dropdown .="</select>";
+	
 
-	  $dropdown = "<select class='form-control' name='receive_vaccine_name' id='receive_vaccine_name'>";
-	  	foreach($result as $val){
-			  $vaccine = $val['description'];
-			  $vacc_id = $val['id'];
-			  $dropdown .= "<option value='$vacc_id'>$vaccine</option>";
-		}
-	  
-		  $dropdown .="</select>";
-
- 		 echo json_encode(array("data" => $dropdown));
+ 	  echo json_encode(array("data" => $dropdown));
 	}
+
+	
 
 
 	public function receive_vaccine($vaccine_id){
-		//print_r($this->input->post('receive_vaccine_quantity'));
-		/*public function insert_data($table_name,$data)
-	{
-		if($data) {
-			$insert = $this->db->insert($table_name, $data);
-			return ($insert == true) ? true : false;
-		}
-	} */
-	$data = array(
-		'item' => "vaccine",
-		'vaccine_id' => $vaccine_id,	
-		'quantity' => $this->input->post('receive_vaccine_quantity'),	
-	);
-		$receive = $this->vaccines->insert_data("receiving_log",$data);
+	
+		$data = array(
+			'vaccine_id' => $vaccine_id,	
+			'quantity' => $this->input->post('receive_vaccine_quantity'),
+			'received_by' => $this->session->userdata('fullname'),
+			'remarks' => $this->input->post('receive_vaccine_remarks'),
+			'expiration_date' => $this->input->post('rec_vaccine_exp_date')
+		);
+		$receive = $this->vaccines->insert_data("vaccines_received",$data);
+		$response = "";
 		if($receive){
 			/*Update total quantity*/
-			$update_quantity = $this->vaccines->update_quantity("vaccines");
+			$update_quantity = $this->vaccines->update_quantity($data);
+			$response = "success";
 		}
+
+		echo json_encode(array("response" => $response));
+	}
+
+	public function proccessIssueVaccine(){
+		$data = array(
+			'vaccine_id' => $this->input->post('issue_vaccine_name'),	
+			'clinic_id' => $this->input->post('issue_clinic_name'),
+			'issued_by' => $this->session->userdata('fullname'),
+			'remarks' => $this->input->post('issue_vaccine_remarks'),
+			'quantity' => $this->input->post('issue_quantity')
+		);
+
+		$issueNow = $this->vaccines->insert_data("vaccines_issued",$data);
+		$response = "";
+		if($issueNow){
+			$response = "success";
+		}
+
+		echo json_encode(array("response" => $response));
 	}
 
 

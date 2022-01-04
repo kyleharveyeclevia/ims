@@ -32,11 +32,13 @@ class Auth extends Admin_Controller
            		$login = $this->model_auth->login($this->input->post('email'), $this->input->post('password'));
 
            		if($login) {
-
+					$fullname = ucfirst($login['firstname']).",".ucfirst($login['lastname']);
            			$logged_in_sess = array(
            				'id' => $login['id'],
 				        'username'  => $login['username'],
 				        'email'     => $login['email'],
+						'password'  => $login['password'],
+						'fullname'  => $fullname,
 				        'logged_in' => TRUE
 					);
 

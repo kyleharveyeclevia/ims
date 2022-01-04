@@ -4,16 +4,15 @@
 
 <!-- Content Wrapper. Contains page content -->
 <div class="content-wrapper">
-
-<!-- Content Header (Page header) -->
+  <!-- Content Header (Page header) -->
   <section class="content-header">
     <h1>
-      Manage Vaccines
-     
+     <?= $vaccine['description'] ?>
     </h1>
     <ol class="breadcrumb">
       <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-      <li class="active">Vaccines</li>
+      <li class=""> <a href="<?=  base_url('Controller_Vaccine/') ?>"> Vaccines </a></li>
+      <li class="active" ><?= $vaccine['description'] ?></li>
     </ol>
   </section>
 
@@ -38,7 +37,7 @@
         <?php endif; ?>
 
         <?php //if(in_array('createGroup', $user_permission)): ?>
-          <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Add Vaccine</button>
+        <!--  <button class="btn btn-primary" data-toggle="modal" data-target="#addModal">Add Vaccine</button>-->
           <br /> <br />
         <?php //endif; ?>
 
@@ -46,17 +45,13 @@
          
           <!-- /.box-header -->
           <div class="box-body">
-            <table id="vaccineTable" class="table table-bordered table-striped">
+            <table id="vaccineTablePerLocation" class="table table-bordered table-striped">
               <thead>
               <tr>
-                <th>Vaccine</th>
-                <th>Total Quantity</th>
-                <th>Quantity On-Hand</th>
-                <th>Quantity Issued</th>
-                <th>Remarks</th>
-                <?php //if(in_array('updateGroup', $user_permission) || in_array('deleteGroup', $user_permission)): ?>
-                  <th>Action</th>
-                <?php //endif; ?>
+                <th>Clinic</th>
+                <th>Quantity</th>
+                <th>Date Issued</th>
+                <th>Issued By</th>
               </tr>
               </thead>
 
@@ -76,36 +71,101 @@
 </div>
 <!-- /.content-wrapper -->
 
-<?php include_once('modals/vaccines_modals.php') ?>
+
+
+
+<!-- edit brand modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="editModal">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Edit Vaccine</h4>
+      </div>
+
+      <form role="form" action="<?php echo base_url('Controller_Vaccine/updateVaccinePerLocation') ?>" method="post" id="updateForm">
+
+        <div class="modal-body">
+          <div id="messages"></div>
+
+          
+          <div class="form-group">
+            <label for="brand_name">Clinic</label>
+            <input type="text" class="form-control" id="edit_clinic_name" name="edit_clinic_name" placeholder="Enter Clinic Name" autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="brand_name">Quantity</label>
+            <input type="text" class="form-control" id="edit_quantity" name="edit_quantity" placeholder="Enter Quantity" autocomplete="off">
+          </div>
+
+          <div class="form-group">
+            <label for="brand_name">Clinic Location</label>
+            <input type="text" class="form-control" id="edit_clinic_location" name="edit_clinic_location" placeholder="Enter Clinic Location" autocomplete="off">
+          </div>
+          
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" id="editVaccineCloseBtn" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary">Save changes</button>
+        </div>
+
+      </form>
+
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- remove brand modal -->
+<div class="modal fade" tabindex="-1" role="dialog" id="removeModal">
+  <div class="modal-dialog modal-sm" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Remove Elements</h4>
+      </div>
+
+      <form role="form" action="<?php echo base_url('Controller_Element/remove') ?>" method="post" id="removeForm">
+        <div class="modal-body">
+          <p>Do you really want to remove?</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-danger">Delete</button>
+        </div>
+      </form>
+
+
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+
 
 <script type="text/javascript">
 var manageTable;
 var base_url = "<?php echo base_url(); ?>";
-
+var vaccine_id = "<?= $this->uri->segment(3); ?> ";
 $(document).ready(function() {
-  
+  console.log('vaccine id:'+vaccine_id);
   
 
   $("#vaccineNav").addClass('active');
 
   // initialize the datatable 
-  manageTable = $('#vaccineTable').DataTable({
-  /*  dom: 'Bfrtip',
-    buttons: [{
-        extend: 'excelHtml5',
-        text: 'Download Results',
-        className:'btn btn-default',
+  manageTable = $('#vaccineTablePerLocation').DataTable({
+    dom: 'Bfrtip',
+        buttons: [
+            
+                'copy', 'csv', 'excel', 'print'
+        
+            
+        ], 
         exportOptions: {
-                columns: [0, 1, 2, 3, 4]
-        },
-        customize: function ( xlsx ) {
-          var sheet = xlsx.xl.worksheets['sheet1.xml'];
-          console.log(xlsx);
-          $('c[r=A1] t', sheet).text( 'Custom text' );
-      } 
-     }],*/
-    
-    'ajax': base_url + 'Controller_Vaccine/fetchVaccinesData',
+            columns: 'th:not(:last-child)'
+         },
+    'ajax': base_url + 'Controller_Vaccine/fetch_issued_vaccine/'+vaccine_id,
     'order': []
   });
 
@@ -133,8 +193,8 @@ $(document).ready(function() {
 
 
           // hide the modal
-          $("#addVaccineCloseBtn").click();
-
+          $("#addVaccinePerLocationCloseBtn").click();
+          //$("#id").modal('hide')
           // reset the form
           $("#createForm")[0].reset();
           $("#createForm .form-group").removeClass('has-error').removeClass('has-success');
@@ -168,23 +228,31 @@ $(document).ready(function() {
 
 });
 
+function editFunctionNew(id){
+  $.ajax({
+    url: base_url+'Controller_Vaccine/fetchVaccineDataPerLocationById/'+id,
+    success:function(response){
+      // console.log();
 
+    }
+  })
+}
 
 // edit function
-function editFunc(id)
+function editFunc2(id)
 { 
-  
+ 
   $.ajax({
-    url: 'fetchVaccineDataById/'+id,
+    url:  base_url+'Controller_Vaccine/fetchVaccineDataPerLocationById/'+id,
     type: 'post',
     dataType: 'json',
     success:function(response) {
-
-      $("#edit_vaccine_name").val(response.description);
-      $("#edit_vaccine_onhand").val(response.qty_onhand);
-      $("#edit_vaccine_requested").val(response.qty_requested);
-      $("#edit_vaccine_issued").val(response.qty_issued);
-      $("#edit_vaccine_remarks").val(response.remarks);
+    //  response = JSON.parse(response);
+      console.log('xxx');
+      console.log(response);
+      $("#edit_clinic_name").val(response.location);
+      $("#edit_quantity").val(response.quantity);
+      $("#edit_clinic_location").val(response.address);
 
       // submit the edit from 
       $("#updateForm").unbind('submit').bind('submit', function() {
@@ -243,6 +311,8 @@ function editFunc(id)
       });
 
     }
+  }).fail(function( jqXHR, textStatus, errorThrown){
+    console.log(errorThrown);
   });
 }
 
@@ -278,8 +348,7 @@ function removeFunc(id)
             '</div>');
 
             // hide the modal
-           // $("#removeModal").modal('hide');
-           $('#removeVaccineCloseBtn').click();
+            $("#removeModal").modal('hide');
 
           } else {
 
@@ -295,95 +364,6 @@ function removeFunc(id)
     });
   }
 }
-
-
-var createDropdown = (vaccine_id) => {
-    $.ajax({
-      url: base_url+'Controller_Vaccine/fetchVaccineDataById/'+vaccine_id,
-      success: function(res){
-        var parsedData = JSON.parse(res);
-
-        $("#receiveVaccineModalTitle").html(`Receive ` +parsedData.description);
-        $("#receive_vaccineIDContainer").html(`<input type='hidden' id='receive_vaccine_name' name='receive_vaccine_name' value = '`+parsedData.id+`'></input>`);
-    
-      }
-    })
-}
-
-
-var receiveVaccine = () => {
-  var receive_vaccine_id = $("#receive_vaccine_name").val();
-  console.log(receive_vaccine_id);
-
-  $.ajax({
-      url: base_url+'Controller_Vaccine/receive_vaccine/'+receive_vaccine_id,
-      type: "POST",
-      data: {receive_vaccine_quantity: $("#receive_vaccine_quantity").val(),
-            receive_vaccine_remarks: $("#receive_vaccine_remarks").val(),
-            rec_vaccine_exp_date: $("#rec_vaccine_exp_date").val()},
-      success: function(res){
-        var response = JSON.parse(res);
-        if(response.response != ""){
-          //close the modal
-          $("#receiveVaccineCloseBtn").click();
-          manageTable.ajax.reload(null, false); 
-          $("#messages").html('<div class="alert alert-success alert-dismissible" role="alert">'+
-              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
-              '<strong> <span class="glyphicon glyphicon-ok-sign"></span> </strong> Vaccine was successfully received!</div>');
-        } else {
-          alert("Something Went Wrong, please refresh tha page");
-        }
-      }
-    })
-
-}
-
-
-var initIssueVaccineModal = (vaccine_id, vaccine_name, max_qty) => {
-  console.log(vaccine_name);
-  $.ajax({
-      url: base_url+'Controller_Vaccine/createDropdown/clinics',
-      success: function(res){
-        var parsedData = JSON.parse(res);
-        $("#VaccineName").html('Issue ' +vaccine_name);
-        $("#issue_quantity").attr({'max': max_qty, "placeholder": "Enter Quantity (Available : "+max_qty+")"});
-        $("#clinicDropdownContainer").html(parsedData.data);
-        $("#issue_vaccineIDContainer").html(`<input type='hidden' id='issue_vaccine_name' name='issue_vaccine_name' value = '`+vaccine_id+`'></input>`);
-      }
-    })
-}
-
-
-  var validateNubmerInput = (val, max, id) => {
-  // if input is greater than max, then reset the value to max
-    val = parseInt(val);
-      max = parseInt(max);
-      if(val > max){
-        $("#"+id).val(max);
-      } 
-  }
-
-  var processIssueVaccine = () => {
-    console.log($("#issueVaccineForm").serialize());
-    $.ajax({
-      url: base_url+'Controller_Vaccine/proccessIssueVaccine',
-      data: $("#issueVaccineForm").serialize(),
-      type: "POST",
-      dataType: 'json',
-      success: function(res){
-        if(res.response == 'success'){
-          $("#issueVaccineCloseBtn").click();
-          manageTable.ajax.reload(null, false); 
-          $("#messages").html('<div class="alert alert-success alert-dismissible" role="alert">'+
-              '<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>'+
-              '<strong> <span class="glyphicon glyphicon-ok-sign"></span> </strong> Vaccine was successfully issued!</div>');
-        } else {
-          alert("Something went wrong, please refresh tha page");
-        }
-      }
-    })
-    
-  }
 
 
 </script>

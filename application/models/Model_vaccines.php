@@ -30,14 +30,32 @@ class Model_vaccines extends CI_Model
 	}
 
 	/*get vaccine data per location */
-	public function getVaccinesDataPerLocation($id = null)
-	{	
-		
-			$sql = "SELECT * FROM vaccines_per_location where vaccine_id = '$id'";
+	public function fetch_issued_vaccine($id = null)
+	{		
+			$sql = "SELECT V.*, C.clinic_name FROM vaccines_issued as V
+					LEFT JOIN clinics as C ON V.clinic_id = C.id
+			 where V.vaccine_id = '$id'";
 			$query = $this->db->query($sql);
 			return $query->result_array();
-		
-	
+	}
+
+	public function fetch_vaccine_data_byid($table, $id = null)
+	{		
+		switch($table){
+			case 'vaccines_issued':
+				$sql ="SELECT V.*, C.clinic_name FROM $table as V
+						LEFT JOIN clinics as C ON V.clinic_id = C.id
+					where V.vaccine_id = '$id'";
+			break;
+
+			case 'vaccines_received':
+				$sql ="SELECT VR.*, V.description FROM $table as VR LEFT JOIN vaccines as V ON V.id = VR.vaccine_id
+				where VR.vaccine_id = '$id' ORDER BY expiration_date ASC";
+			break;
+		}
+			
+			$query = $this->db->query($sql);
+			return $query->result_array();
 	}
 
 	public function getVaccinesData2($id = null)
@@ -54,7 +72,7 @@ class Model_vaccines extends CI_Model
 	}
 
 	public function countTotalVaccineIssued($vaccine_id){
-		$query = "SELECT SUM(quantity) as total_issued FROM vaccines_per_location WHERE vaccine_id = '$vaccine_id'";
+		$query = "SELECT SUM(quantity) as total_issued FROM vaccines_issued WHERE vaccine_id = '$vaccine_id'";
 		$result = $this->db->query($query)->result_array();
 		if($result){
 			return $result[0]['total_issued'];
@@ -161,6 +179,20 @@ class Model_vaccines extends CI_Model
 
 	public function get_table_data($table_name){
 		$query = "SELECT * FROM $table_name";
+		return $this->db->query($query)->result_array();
+	}
+
+	public function update_quantity($data){
+	//	print_r($data);
+		$vaccine_id = $data['vaccine_id'];
+		$quantity = $data['quantity'];
+		$query = "UPDATE vaccines SET total_quantity = total_quantity + $quantity WHERE id = '$vaccine_id'";
+		$this->db->query($query);
+		return $this->db->affected_rows();
+	}
+
+	public function get_table_data_byid($table,$column,$id){
+		$query = "SELECT * FROM $table WHERE $column = '$id'";
 		return $this->db->query($query)->result_array();
 	}
 
