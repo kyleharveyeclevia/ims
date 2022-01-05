@@ -47,7 +47,7 @@
           </li>
           <?php endif; ?>
 
-          <?php if(in_array('createAttribute', $user_permission) || in_array('updateAttribute', $user_permission) || in_array('viewAttribute', $user_permission) || in_array('deleteAttribute', $user_permission)): ?>
+          <?php if(in_array('createVaccine', $user_permission) || in_array('updateVaccine', $user_permission) || in_array('viewVaccine', $user_permission) || in_array('deleteVaccine', $user_permission)): ?>
           <li id="vaccineNav">
             <a href="<?php echo base_url('Controller_Vaccine/') ?>">
               <i class="fas fa-syringe"></i> <span>Vaccines</span>
@@ -155,7 +155,7 @@
 
 
           <?php if(in_array('updateCompany', $user_permission)): ?>
-            <li id="companyNav" ><a href="<?php echo base_url('Controller_Company/') ?>"><i class="fa fa-bank"></i> <span>Company</span></a></li>
+            <li id="companyNav" style="display:none" ><a href="<?php echo base_url('Controller_Company/') ?>"><i class="fa fa-bank"></i> <span>Company</span></a></li>
           <?php endif; ?>
 
         <?php endif; ?>

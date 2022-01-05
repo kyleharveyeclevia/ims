@@ -121,6 +121,14 @@
                         <td><input type="checkbox" name="permission[]" id="permission" value="viewOrder" class="minimal"></td>
                         <td><input type="checkbox" name="permission[]" id="permission" value="deleteOrder" class="minimal"></td>
                       </tr>
+
+                      <tr>
+                        <td>Vaccines</td>
+                        <td><input type="checkbox" name="permission[]" id="permission" value="createVaccine" class="minimal"></td>
+                        <td><input type="checkbox" name="permission[]" id="permission" value="updateVaccine" class="minimal"></td>
+                        <td><input type="checkbox" name="permission[]" id="permission" value="viewVaccine" class="minimal"></td>
+                        <td><input type="checkbox" name="permission[]" id="permission" value="deleteVaccine" class="minimal"></td>
+                      </tr>
                       
                       <tr>
                         <td>Company</td>

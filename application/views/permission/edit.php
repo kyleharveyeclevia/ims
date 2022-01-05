@@ -196,6 +196,23 @@
                           if(in_array('deleteOrder', $serialize_permission)) { echo "checked"; } 
                         } ?>></td>
                       </tr>
+
+                      <tr>
+                        <td>Vaccines</td>
+                        <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="createVaccine" <?php if($serialize_permission) {
+                          if(in_array('createVaccine', $serialize_permission)) { echo "checked"; } 
+                        } ?>></td>
+                        <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="updateVaccine" <?php if($serialize_permission) {
+                          if(in_array('updateVaccine', $serialize_permission)) { echo "checked"; } 
+                        } ?>></td>
+                        <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="viewVaccine" <?php if($serialize_permission) {
+                          if(in_array('viewVaccine', $serialize_permission)) { echo "checked"; } 
+                        } ?>></td>
+                        <td><input type="checkbox" name="permission[]" id="permission" class="minimal" value="deleteVaccine" <?php if($serialize_permission) {
+                          if(in_array('deleteVaccine', $serialize_permission)) { echo "checked"; } 
+                        } ?>></td>
+                      </tr>
+                     
                      
                       <tr>
                         <td>Company</td>

@@ -20,7 +20,7 @@ class Controller_Vaccine extends Admin_Controller
 	*/
 	public function index()
 	{
-		if(!in_array('viewAttribute', $this->permission)) {
+		if(!in_array('viewVaccine', $this->permission)) {
 			redirect('dashboard', 'refresh');
 		}
 
@@ -28,7 +28,7 @@ class Controller_Vaccine extends Admin_Controller
 	}
 
 	public function vaccines_issued($vaccine_id){
-		if(!in_array('viewAttribute', $this->permission)) {
+		if(!in_array('viewVaccine', $this->permission)) {
 			redirect('dashboard', 'refresh');
 		}
 		$this->data['vaccine'] =  $this->vaccines->getVaccinesData($vaccine_id);
@@ -37,7 +37,7 @@ class Controller_Vaccine extends Admin_Controller
 	}
 
 	public function vaccines_received($vaccine_id){
-		if(!in_array('viewAttribute', $this->permission)) {
+		if(!in_array('viewVaccine', $this->permission)) {
 			redirect('dashboard', 'refresh');
 		}
 		$this->data['vaccine'] =  $this->vaccines->getVaccinesData($vaccine_id);

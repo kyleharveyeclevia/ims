@@ -43,7 +43,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Edit Element</h4>
+        <h4 class="modal-title">Edit Clinic</h4>
       </div>
 
       <form role="form" action="<?php echo base_url('Controller_Clinics/update') ?>" method="post" id="updateForm">
