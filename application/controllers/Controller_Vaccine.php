@@ -207,6 +207,11 @@ class Controller_Vaccine extends Admin_Controller
 					$issueBtn = '<a href="#" class="btn btn-danger" data-toggle="modal" onclick="initDisposeVaccineModal('.$value['vaccine_id'].',\''.$value['description'].'\', '.$value['quantity'].', '.$value['id'].')" data-target="#disposeVaccineModal">Dispose Vaccine</a>';
 				}
 			}
+			
+			if(!in_array('createVaccine', $this->permission)){
+				$issueBtn = "-";
+			}
+
 
 			$result['data'][$key] = array(
 				//$value['clinic_name'],
