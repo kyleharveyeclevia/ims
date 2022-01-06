@@ -103,10 +103,19 @@ class Controller_Vaccine extends Admin_Controller
 			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccines_issued/'.$value['id'].'').'">'.$countTotalVaccinesIssued.'</a>';
 			$quantity_received = '<a href="'.base_url('Controller_Vaccine/vaccines_received/'.$value['id'].'').'">'.$value['total_quantity'].'</a>';
 			// button
-			$buttons = '
-			<button type="button" class="btn btn-warning btn-sm" onclick="editFunc('.$value['id'].')" data-toggle="modal" data-target="#editModal"><i class="fa fa-pencil"></i></button>
-			<button type="button" class="btn btn-danger btn-sm" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal"><i class="fa fa-trash"></i></button>
-			<button class="btn btn-default" data-toggle="modal" onclick="createDropdown()" data-target="#receiveModal">Receive Vaccine</button>';
+
+			$receiveBtnClass="";
+			$editBtnClass="";
+			$deleteBtnClass="";
+			if(!in_array('createVaccine', $this->permission)){
+				$receiveBtnClass="style='display:none'"	;
+			}
+			if(!in_array('editVaccine', $this->permission)){
+				$editBtnClass="style='display:none'"	;
+			}
+			if(!in_array('deleteVaccine', $this->permission)){
+				$deleteBtnClass="style='display:none'"	;
+			}
 			
 
 			$buttons = '<div class="dropdown">
@@ -115,11 +124,16 @@ class Controller_Vaccine extends Admin_Controller
 			  
 			</button>
 			<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
-			  <li><a href="#" onclick="editFunc('.$value['id'].')" data-toggle="modal" data-target="#editModal">Edit</a></li>
-			  <li><a href="#" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal">Delete</a></li>
-			  <li><a href="#" data-toggle="modal" onclick="createDropdown('.$value['id'].')" data-target="#receiveModal">Receive Vaccine</a></li>
+			  <li '.$editBtnClass.'><a href="#" onclick="editFunc('.$value['id'].')" data-toggle="modal" data-target="#editModal">Edit</a></li>
+			  <li  '.$deleteBtnClass.' ><a href="#" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal">Delete</a></li>
+			  <li '.$receiveBtnClass.'><a href="#" data-toggle="modal" onclick="createDropdown('.$value['id'].')" data-target="#receiveModal">Receive Vaccine</a></li>
 			</ul>
-		  </div>';
+		 	 </div>';
+			
+			if(!empty($receiveBtnClass) && !empty($deleteBtnClass) && !empty($editBtnClass)){
+				$button="-";
+			}
+
 			$vaccine_name = $value['sub_description']?'<b>'.$value['description'].'</b><br><p style="font-size:11px">'.$value['sub_description'].'</p>':'<b>'.$value['description'].'</b>';
 	
 			$result['data'][$key] = array(
