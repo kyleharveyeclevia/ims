@@ -215,4 +215,9 @@ class Model_vaccines extends CI_Model
 		return $this->db->query($query)->result_array();
 	}
 
+	public function count_total_vaccines(){
+		$query = "SELECT * FROM vaccines";
+		return $this->db->query($query)->num_rows();
+	}
+
 }

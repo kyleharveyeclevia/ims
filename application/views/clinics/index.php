@@ -83,7 +83,7 @@ $(document).ready(function() {
 
   
 
-  $("#attributeNav").addClass('active');
+  $("#clinicNav").addClass('active');
 
   // initialize the datatable 
   manageTable = $('#manageTable').DataTable({

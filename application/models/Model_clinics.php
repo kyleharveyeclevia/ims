@@ -51,6 +51,11 @@ class Model_clinics extends CI_Model
 		}
 	}
 
+	public function get_total_clinics(){
+		$query = "SELECT * FROM clinics";
+		return $this->db->query($query)->num_rows();
+	}
+
 	
 
 }

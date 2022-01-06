@@ -78,7 +78,7 @@ class Controller_Vaccine extends Admin_Controller
 			//date("d-m-Y", strtotime($originalDate)
 			$expiration_date = $value['expiration_date']?date("d-M-Y", strtotime($value['expiration_date'])):'No Expiration';
 			
-			//date checker
+			//for expiration badge
 			$badge = "";
 			if($value['expiration_date']){
 				$date_now = date("Y-m-d");
@@ -93,6 +93,12 @@ class Controller_Vaccine extends Admin_Controller
 					$badge = '<span class="label label-danger">Expired</span>';
 				}
 			}
+
+			//for quantity badge
+			$qtybadge = "";
+			if($value['total_quantity'] < 21){
+				$qtybadge = '<span class="label label-warning">Low!</span>';
+			}
 			
 
 		 	$countTotalVaccinesIssued = $this->vaccines->countTotalVaccineIssued($value['id']);
@@ -101,7 +107,7 @@ class Controller_Vaccine extends Admin_Controller
 			}
 
 			$quantity_issued = '<a href="'.base_url('Controller_Vaccine/vaccines_issued/'.$value['id'].'').'">'.$countTotalVaccinesIssued.'</a>';
-			$quantity_received = '<a href="'.base_url('Controller_Vaccine/vaccines_received/'.$value['id'].'').'">'.$value['total_quantity'].'</a>';
+			$quantity_received = '<a href="'.base_url('Controller_Vaccine/vaccines_received/'.$value['id'].'').'">'.$value['total_quantity'].'</a> '.$qtybadge;
 			// button
 
 			$receiveBtnClass="";
@@ -110,7 +116,7 @@ class Controller_Vaccine extends Admin_Controller
 			if(!in_array('createVaccine', $this->permission)){
 				$receiveBtnClass="style='display:none'"	;
 			}
-			if(!in_array('editVaccine', $this->permission)){
+			if(!in_array('updateVaccine', $this->permission)){
 				$editBtnClass="style='display:none'"	;
 			}
 			if(!in_array('deleteVaccine', $this->permission)){
@@ -125,7 +131,7 @@ class Controller_Vaccine extends Admin_Controller
 			</button>
 			<ul class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenu1">
 			  <li '.$editBtnClass.'><a href="#" onclick="editFunc('.$value['id'].')" data-toggle="modal" data-target="#editModal">Edit</a></li>
-			  <li  '.$deleteBtnClass.' ><a href="#" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal">Delete</a></li>
+			  <li '.$deleteBtnClass.'><a href="#" onclick="removeFunc('.$value['id'].')" data-toggle="modal" data-target="#removeModal">Delete</a></li>
 			  <li '.$receiveBtnClass.'><a href="#" data-toggle="modal" onclick="createDropdown('.$value['id'].')" data-target="#receiveModal">Receive Vaccine</a></li>
 			</ul>
 		 	 </div>';
