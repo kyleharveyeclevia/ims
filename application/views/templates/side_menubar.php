@@ -24,7 +24,7 @@
           <?php endif; ?>
 
           <?php if(in_array('createCategory', $user_permission) || in_array('updateCategory', $user_permission) || in_array('viewCategory', $user_permission) || in_array('deleteCategory', $user_permission)): ?>
-            <li id="categoryNav" style="display:none">
+            <li id="categoryNav">
               <a href="<?php echo base_url('Controller_Category/') ?>">
                 <i class="fa fa-cubes"></i> <span>Category</span>
               </a>
@@ -32,7 +32,7 @@
           <?php endif; ?>
 
           <?php if(in_array('createStore', $user_permission) || in_array('updateStore', $user_permission) || in_array('viewStore', $user_permission) || in_array('deleteStore', $user_permission)): ?>
-            <li id="storeNav" style="display:none">
+            <li id="storeNav" >
               <a href="<?php echo base_url('Controller_Warehouse/') ?>">
                 <i class="fa fa-institution"></i> <span>Warehouse</span>
               </a>
@@ -40,7 +40,7 @@
           <?php endif; ?>
 
           <?php if(in_array('createAttribute', $user_permission) || in_array('updateAttribute', $user_permission) || in_array('viewAttribute', $user_permission) || in_array('deleteAttribute', $user_permission)): ?>
-          <li id="attributeNav" style="display:none">
+          <li id="attributeNav" >
             <a href="<?php echo base_url('Controller_Element/') ?>">
               <i class="far fa-copy"></i> <span>Elements</span>
             </a>
